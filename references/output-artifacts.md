@@ -34,7 +34,7 @@ A strong merchant skill for OpenClaw integration output should usually include:
 
 A strong merchant skill for generic agent integration output should usually include:
 
-- agent-payment-skills dependency checklist
+- agentic-payment-skills dependency checklist
 - merchant skill or merchant tool responsibility checklist
 - generic agent adapter checklist
 - runtime contract assumptions
@@ -43,7 +43,7 @@ A strong merchant skill for generic agent integration output should usually incl
 - callback and resume design
 - merchant confirmation checklist
 - idempotency and duplicate-delivery rules
-- ownership matrix for merchant skill or tool, agent runtime, adapter, merchant server, and `agent-payment-skills`
+- ownership matrix for merchant skill or tool, agent runtime, adapter, merchant server, and `agentic-payment-skills`
 
 ## Validation Artifacts
 

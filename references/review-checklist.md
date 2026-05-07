@@ -7,6 +7,9 @@ This file is for final review and self-check. It is not the primary workflow doc
 ## Global Checks
 
 - does the output stay aligned with the local Clink docs available in the current environment
+- for OpenClaw agent review, did the review load and read `openclaw-payment-skills` through `node scripts/load_payment_skill_contexts.mjs --dependency openclaw-payment-skills --print-path`
+- for generic agent review, did the review load and read `agentic-payment-skills` through `node scripts/load_payment_skill_contexts.mjs --dependency agentic-payment-skills --print-path`
+- if payment skill context fell back to local files, does the output disclose that exact payment skill behavior is not confirmed latest
 - are exact API claims backed by `api-reference/openapi.json`
 - does the output avoid inventing undocumented behavior
 - is the scenario routing correct
@@ -33,6 +36,8 @@ This file is for final review and self-check. It is not the primary workflow doc
 ## Merchant Skill for OpenClaw Integration Checks
 
 - does the design use `openclaw-payment-skills` for the OpenClaw payment skill path
+- does the design align exact OpenClaw payment tool names, return directives, and notification ownership with the loaded `openclaw-payment-skills` context
+- does the merchant skill call, handle, and resume according to the loaded `openclaw-payment-skills` contract without adding duplicate payment-layer behavior
 - does the design clearly distinguish merchant skill from `openclaw-payment-skills`
 - does it define merchant server responsibilities
 - does it include agent payment session creation/querying
@@ -49,7 +54,9 @@ This file is for final review and self-check. It is not the primary workflow doc
 
 - does the design identify that the runtime is not OpenClaw when taking the merchant skill for generic agent path
 - does it define merchant skill or merchant tool responsibilities before delegating to the generic agent runtime or adapter
-- does the design use `agent-payment-skills` / `clink-payment-skill` as the generic agent payment skill
+- does the design use `agentic-payment-skills` / `clink-payment-skill` as the generic agent payment skill
+- does the design align exact CLI flags, exit-code handling, refund behavior, and payment-method freshness rules with the loaded `agentic-payment-skills` context
+- does the merchant skill or adapter call, handle, and resume according to the loaded `agentic-payment-skills` / `clink-payment-skill` contract without assuming OpenClaw runtime behavior
 - does it account for `clink-cli` JSON output and exit code handling
 - does it require Node.js >= 20 and `clink-cli` installation before payment operations
 - does it avoid automatic `wallet init` during payment and handle exit code `3` or `4` as setup/auth recovery
@@ -68,7 +75,7 @@ This file is for final review and self-check. It is not the primary workflow doc
 - does it include merchant confirmation ownership and exactly-once or idempotent confirmation behavior
 - does it define callback, polling, queue, or recovery behavior for asynchronous payment completion
 - does it define task resume behavior after merchant confirmation
-- does it separate merchant skill or tool, agent runtime, adapter, merchant server, `agent-payment-skills`, webhook handler, notification sender, and recovery ownership
+- does it separate merchant skill or tool, agent runtime, adapter, merchant server, `agentic-payment-skills`, webhook handler, notification sender, and recovery ownership
 - does it include `customer.verify` handling when email verification is in scope
 
 ## Documentation Checks

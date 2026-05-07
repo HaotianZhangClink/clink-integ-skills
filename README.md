@@ -21,7 +21,7 @@ Instead of copying Clink product docs into the skill repository, this skill keep
 You can use this skill to:
 
 - design standard integration flows, including registered-product product and price selection, checkout session creation, subscription-aware purchase-path routing, webhook contract review, and optional embedded form integration through JS SDK
-- design merchant skill for generic agent integration using `agent-payment-skills` / `clink-payment-skill`, including `clink-cli` dependency setup, adapter contracts, payment execution, callback, and task resume behavior
+- design merchant skill for generic agent integration using `agentic-payment-skills` / `clink-payment-skill`, including `clink-cli` dependency setup, adapter contracts, payment execution, callback, and task resume behavior
 - design merchant skill for OpenClaw integration using `openclaw-payment-skills`, including merchant skill integration and merchant backend webhook support for email verification via `customer.verify`
 - answer questions based on official Clink docs and extract relevant endpoint, field, webhook, and contract details
 - review payment handoff contracts in merchant skill integrations
@@ -45,16 +45,18 @@ For documentation-backed guidance, the expected scope includes:
 For merchant skill for generic agent integration, the expected scope includes:
 
 - identifying the target agent runtime and whether an adapter is needed
+- loading the latest available `agentic-payment-skills` context before generating or reviewing code
 - defining merchant skill or merchant tool responsibilities in the generic agent runtime
-- defining how the generic agent invokes `agent-payment-skills` / `clink-payment-skill`
-- supporting merchant `402 Payment Required` handoff into `agent-payment-skills` when the merchant returns a structured payment requirement
+- defining how the generic agent invokes `agentic-payment-skills` / `clink-payment-skill`
+- supporting merchant `402 Payment Required` handoff into `agentic-payment-skills` when the merchant returns a structured payment requirement
 - defining payment invocation, merchant confirmation, callback, and resume contract
-- separating generic agent runtime, adapter, merchant server, and `agent-payment-skills` ownership
+- separating generic agent runtime, adapter, merchant server, and `agentic-payment-skills` ownership
 - defining idempotency and duplicate-delivery behavior for handoff, callback, webhook, and confirmation paths
 - preserving the `clink-payment-skill` boundary: it executes wallet/card/pay/refund/risk-rule operations, but does not decide pricing, entitlement, or merchant receipt confirmation
 
 For merchant skill for OpenClaw integration, the expected scope includes:
 
+- loading the latest available `openclaw-payment-skills` context before generating or reviewing code
 - defining merchant skill responsibilities inside the OpenClaw runtime
 - defining how the merchant skill invokes `openclaw-payment-skills`
 - defining session mode or direct mode payment setup
@@ -83,7 +85,7 @@ Examples:
 
 - `Design a standard integration for checkout, webhook, and refund`
 - `Design a registered-product integration with product/price selection, checkout, webhook, and customer portal fallback`
-- `Design a merchant skill for generic agent integration using agent-payment-skills for my custom agent runtime with clink-cli payment execution, callback, and task resume`
+- `Design a merchant skill for generic agent integration using agentic-payment-skills for my custom agent runtime with clink-cli payment execution, callback, and task resume`
 - `Design a merchant skill for OpenClaw integration using openclaw-payment-skills with merchant skill handoff and customer.verify email verification support`
 - `Explain what this Clink API field means based on the official docs`
 - `Review this payment handoff contract`
@@ -102,6 +104,7 @@ Examples:
 | `references/output-artifacts.md` | Developer-facing artifact expectations |
 | `references/validation-workflow.md` | Validation workflow |
 | `references/review-checklist.md` | Review checklist and quality gates |
+| `scripts/load_payment_skill_contexts.mjs` | Payment skill context refresh and cache loader |
 
 ---
 
@@ -131,6 +134,15 @@ Common references live inside the cached `llms-full.txt`, including:
 - integration content
 - API reference content
 - webhook-related content
+
+For merchant skill paths, the skill also refreshes payment skill context before code generation or review:
+
+```bash
+node scripts/load_payment_skill_contexts.mjs --dependency agentic-payment-skills --print-path
+node scripts/load_payment_skill_contexts.mjs --dependency openclaw-payment-skills --print-path
+```
+
+For generic agent integration review, load and read `agentic-payment-skills`. For OpenClaw agent review, load and read `openclaw-payment-skills`. The script downloads the requested GitHub codeload zip context into `.cache/payment-skill-contexts/`, writes source metadata, and avoids mutating sibling payment skill worktrees. If zip download fails, it falls back to local sibling skill files and marks the context as not confirmed latest.
 
 ---
 
@@ -167,6 +179,7 @@ Use the bundled scripts when you want more than prose:
 
 ```bash
 node scripts/load_official_docs.mjs --json
+node scripts/load_payment_skill_contexts.mjs --json
 node scripts/lint_contract.mjs path/to/contract.json
 node scripts/lint_webhook_design.mjs path/to/design.md
 node scripts/generate_guidance_artifacts.mjs --prompt "Design a Clink webhook integration"
@@ -176,6 +189,7 @@ node scripts/run_skill_runtime.mjs --prompt "Review this payment handoff contrac
 These scripts turn the skill into a developer integration workbench:
 
 - docs gate enforcement
+- payment skill context refresh for agentic-payment-skills and openclaw-payment-skills
 - contract validation
 - webhook design validation
 - guidance artifact generation

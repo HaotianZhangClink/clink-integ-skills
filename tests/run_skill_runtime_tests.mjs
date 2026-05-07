@@ -64,7 +64,7 @@ async function main() {
     docsFallbackSource: docsFallback,
   });
   check(docsQuestion.docsGateInvoked === true, "docs question should invoke docs gate");
-  check(docsQuestion.docsTrace.action === "fallback" || docsQuestion.docsTrace.action === "refresh" || docsQuestion.docsTrace.action === "cache", "docs question should produce docs trace");
+  check(["fallback", "refresh", "cache", "stale-cache"].includes(docsQuestion.docsTrace.action), "docs question should produce docs trace");
   check(docsQuestion.notes.some((item) => item.includes("refund-create API")), "docs question should warn that refund-create API is not confirmed");
   check(docsQuestion.route === "documentation_dialogue", "public API question should route to documentation_dialogue");
 

@@ -18,9 +18,11 @@ The merchant side does not rebuild the full payment infrastructure itself. Inste
 - `openclaw-payment-skills` handles payment infrastructure and payment execution
 - the merchant side handles its own business preparation, confirmation, and task recovery
 
-This path is specifically for OpenClaw. For merchant skill for generic agent integration using `agent-payment-skills` / `clink-payment-skill` through `clink-cli`, use `references/generic-agent-integration.md`.
+This path is specifically for OpenClaw. For merchant skill for generic agent integration using `agentic-payment-skills` / `clink-payment-skill` through `clink-cli`, use `references/generic-agent-integration.md`.
 
 ## Main Responsibilities
+
+Before generating code or reviewing an implementation for this path, load the latest available `openclaw-payment-skills` context through `node scripts/load_payment_skill_contexts.mjs --dependency openclaw-payment-skills --print-path` and read the generated context file. Treat this module as integration guidance, and treat the loaded payment skill context as the current source for exact OpenClaw tool names, merchant integration metadata, notification routing, tool return directives, and ownership boundaries.
 
 ### Merchant Skill / Agent
 
@@ -53,6 +55,8 @@ The merchant server should:
 - payment execution
 - payment-layer notifications
 - payment handoff output
+
+When the loaded payment skill context conflicts with the static bullets below, prefer the loaded payment skill context for exact payment skill behavior and update the output to mention the specific source commit when precision matters.
 
 ## Integration Modes
 

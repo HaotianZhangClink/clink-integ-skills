@@ -2,24 +2,26 @@
 
 ## Definition
 
-Merchant skill for generic agent integration is the Clink integration path where a merchant skill, merchant tool, or merchant-facing capability runs inside a non-OpenClaw agent runtime and uses `agent-payment-skills` as its payment skill.
+Merchant skill for generic agent integration is the Clink integration path where a merchant skill, merchant tool, or merchant-facing capability runs inside a non-OpenClaw agent runtime and uses `agentic-payment-skills` as its payment skill.
 
-Use this path when the integrator has its own generic agent runtime, orchestration layer, tool protocol, or chat surface, and wants a merchant skill in that runtime to use `agent-payment-skills` / `clink-payment-skill` through `clink-cli`.
+Use this path when the integrator has its own generic agent runtime, orchestration layer, tool protocol, or chat surface, and wants a merchant skill in that runtime to use `agentic-payment-skills` / `clink-payment-skill` through `clink-cli`.
 
-It also covers merchant-originated payment handoff after a merchant API or tool returns `402 Payment Required`. In that pattern, the merchant response provides a structured payment requirement, and the generic agent runtime or adapter turns that requirement into an `agent-payment-skills` invocation after explicit user authorization.
+It also covers merchant-originated payment handoff after a merchant API or tool returns `402 Payment Required`. In that pattern, the merchant response provides a structured payment requirement, and the generic agent runtime or adapter turns that requirement into an `agentic-payment-skills` invocation after explicit user authorization.
 
 This path is different from:
 
 - standard integration, where a merchant backend directly creates checkout sessions and owns the browser payment entry
 - merchant skill for OpenClaw integration, where OpenClaw skills use `openclaw-payment-skills` and share known skill/runtime conventions
 
-The generic agent side does not assume OpenClaw-specific session state, tool names, memory layout, notification channels, or resume behavior. Those details must be defined by the integrator, while direct payment execution follows `agent-payment-skills`.
+The generic agent side does not assume OpenClaw-specific session state, tool names, memory layout, notification channels, or resume behavior. Those details must be defined by the integrator, while direct payment execution follows `agentic-payment-skills`.
 
 ## Payment Skill Dependency
 
+Before generating code or reviewing an implementation for this path, load the latest available `agentic-payment-skills` context through `node scripts/load_payment_skill_contexts.mjs --dependency agentic-payment-skills --print-path` and read the generated context file. Treat this module as integration guidance, and treat the loaded payment skill context as the current source for exact tool behavior, CLI flags, exit handling, notification directives, and ownership boundaries.
+
 Merchant skill for generic agent integration depends on:
 
-- `agent-payment-skills`
+- `agentic-payment-skills`
 - skill name: `clink-payment-skill`
 - command path: `clink-cli`
 - Node.js >= 20
@@ -45,7 +47,9 @@ It does not own:
 
 ## Agentic Payment Skill Runtime Rules
 
-Merchant skill for generic agent integration must preserve the runtime rules from `agent-payment-skills`.
+Merchant skill for generic agent integration must preserve the runtime rules from `agentic-payment-skills`.
+
+When the loaded payment skill context conflicts with the static bullets below, prefer the loaded payment skill context for exact command behavior and update the output to mention the specific source commit when precision matters.
 
 ### Setup And Secrets
 
@@ -127,7 +131,7 @@ The merchant server should:
 
 ### Agentic Payment Skill
 
-`agent-payment-skills` / `clink-payment-skill` should handle:
+`agentic-payment-skills` / `clink-payment-skill` should handle:
 
 - `clink-cli wallet init`
 - `clink-cli wallet status`
@@ -178,7 +182,7 @@ Expected behavior:
 
 ### Direct Mode
 
-Use this mode when the agent passes payment inputs directly to `agent-payment-skills`.
+Use this mode when the agent passes payment inputs directly to `agentic-payment-skills`.
 
 Expected behavior:
 
@@ -189,7 +193,7 @@ Expected behavior:
 
 ### Adapter Mode
 
-Use this mode when the generic agent runtime cannot call `agent-payment-skills` or `clink-cli` directly and needs a thin adapter.
+Use this mode when the generic agent runtime cannot call `agentic-payment-skills` or `clink-cli` directly and needs a thin adapter.
 
 Expected behavior:
 
@@ -208,7 +212,7 @@ Expected behavior:
 - handoff includes either `sessionId` for session mode or direct-mode fields such as merchant identity, amount, and currency
 - handoff includes correlation data such as task id, merchant request id, order intent id, user id, or conversation id
 - handoff includes a retry target, confirmation target, or resume target for the original merchant action
-- agent runtime or adapter stores the pending task before invoking `agent-payment-skills`
+- agent runtime or adapter stores the pending task before invoking `agentic-payment-skills`
 - agent runtime asks for explicit user authorization for the exact charge described by the handoff
 - after payment succeeds, merchant confirmation runs before the original merchant action is retried or resumed
 - duplicate `402 Payment Required` responses for the same merchant request are deduplicated by a stable handoff id or idempotency key
@@ -262,9 +266,9 @@ Do not send duplicate merchant success or failure notifications if the merchant 
 1. generic agent detects a payment requirement
 2. agent runtime stores pending task and correlation context
 3. merchant server creates or validates a payment session or payment intent
-4. agent runtime or adapter invokes `agent-payment-skills` with explicit payment context
-5. `agent-payment-skills` executes the payment flow through `clink-cli`
-6. `agent-payment-skills` returns structured payment result or handoff data
+4. agent runtime or adapter invokes `agentic-payment-skills` with explicit payment context
+5. `agentic-payment-skills` executes the payment flow through `clink-cli`
+6. `agentic-payment-skills` returns structured payment result or handoff data
 7. agent runtime, adapter, or merchant server calls the merchant confirmation path
 8. merchant confirmation returns merchant-layer success, failure, or retryable state
 9. agent runtime resumes or recovers the original task based on that result
@@ -275,8 +279,8 @@ Do not send duplicate merchant success or failure notifications if the merchant 
 2. merchant returns `402 Payment Required` with a structured `payment_required` handoff
 3. agent runtime or adapter validates and stores the handoff with pending task correlation data
 4. agent runtime asks the user to authorize the exact payment described by the handoff
-5. agent runtime or adapter invokes `agent-payment-skills` using session mode or direct mode fields from the handoff
-6. `agent-payment-skills` executes the payment flow through `clink-cli`
+5. agent runtime or adapter invokes `agentic-payment-skills` using session mode or direct mode fields from the handoff
+6. `agentic-payment-skills` executes the payment flow through `clink-cli`
 7. agent runtime, adapter, or merchant server calls merchant confirmation exactly once for the payment result
 8. agent runtime retries, resumes, or completes the original merchant task through the handoff's retry or resume target
 
@@ -288,12 +292,12 @@ This path should clearly separate ownership between:
 - generic agent runtime
 - adapter layer, when present
 - merchant server
-- `agent-payment-skills`
+- `agentic-payment-skills`
 - webhook handler
 - notification sender
 - recovery and resume logic
 
-Payment-layer execution belongs to `agent-payment-skills`.
+Payment-layer execution belongs to `agentic-payment-skills`.
 
 Merchant-layer success or failure belongs to the merchant confirmation path.
 
@@ -306,7 +310,7 @@ Do not let multiple layers independently confirm the same payment result.
 A good merchant skill for generic agent integration output should usually include:
 
 - runtime contract assumptions
-- agent-payment-skills dependency checklist
+- agentic-payment-skills dependency checklist
 - session mode, direct mode, or adapter mode selection
 - merchant `402 Payment Required` handoff handling when the merchant uses that protocol
 - merchant skill or merchant tool responsibility checklist
@@ -316,4 +320,4 @@ A good merchant skill for generic agent integration output should usually includ
 - callback and resume design
 - idempotency and duplicate-delivery rules
 - `customer.verify` handling when email verification is in scope
-- ownership matrix across merchant skill or tool, agent runtime, adapter, merchant server, and `agent-payment-skills`
+- ownership matrix across merchant skill or tool, agent runtime, adapter, merchant server, and `agentic-payment-skills`

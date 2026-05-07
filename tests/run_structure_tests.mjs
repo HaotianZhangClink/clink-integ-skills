@@ -11,6 +11,7 @@ const requiredFiles = [
   "package.json",
   "scripts/refresh_official_docs.mjs",
   "scripts/load_official_docs.mjs",
+  "scripts/load_payment_skill_contexts.mjs",
   "scripts/lint_contract.mjs",
   "scripts/lint_webhook_design.mjs",
   "scripts/generate_guidance_artifacts.mjs",
@@ -51,15 +52,32 @@ const moduleExpectations = [
       "merchant skill for generic agent integration",
       "merchant skill for OpenClaw integration",
       "openclaw-payment-skills",
-      "agent-payment-skills",
+      "agentic-payment-skills",
       "Clink documentation-backed guidance",
       "Integration Validation",
       "merchantReferenceId",
       "customer.verify",
       "node scripts/load_official_docs.mjs",
+      "node scripts/load_payment_skill_contexts.mjs",
+      "--dependency openclaw-payment-skills",
+      "--dependency agentic-payment-skills",
       "guidance artifacts",
       "sandbox",
       "production"
+    ]
+  },
+  {
+    file: "scripts/load_payment_skill_contexts.mjs",
+    contains: [
+      "--dependency",
+      "selectedDependencies",
+      "contextPathForResults",
+      "agentic-payment-skills.md",
+      "openclaw-payment-skills.md",
+      "codeload.github.com",
+      "downloadZip",
+      "zip-download",
+      "unzip"
     ]
   },
   {
@@ -75,7 +93,13 @@ const moduleExpectations = [
       "Do not read or cite",
       "POST /order/payment-session",
       "WEBHOOK customer.verify",
-      "merchant skill for generic agent integration"
+      "merchant skill for generic agent integration",
+      "payment-skill-contexts",
+      "codeload.github.com",
+      "OpenClaw agent review",
+      "generic agent review",
+      "CLINK_AGENTIC_PAYMENT_SKILLS_URL",
+      "CLINK_OPENCLAW_PAYMENT_SKILLS_URL"
     ]
   },
   {
@@ -104,6 +128,7 @@ const moduleExpectations = [
       "merchant skill",
       "merchant server",
       "openclaw-payment-skills",
+      "latest available `openclaw-payment-skills` context",
       "OpenClaw-native",
       "Session Mode",
       "Direct Mode",
@@ -121,7 +146,8 @@ const moduleExpectations = [
     contains: [
       "merchant skill for generic agent integration",
       "OpenClaw",
-      "agent-payment-skills",
+      "agentic-payment-skills",
+      "latest available `agentic-payment-skills` context",
       "clink-payment-skill",
       "clink-cli",
       "agent runtime",
@@ -162,7 +188,10 @@ const moduleExpectations = [
       "card binding-link",
       "customerApiKey",
       "original `orderId`",
-      "refund"
+      "refund",
+      "load_payment_skill_contexts",
+      "--dependency openclaw-payment-skills",
+      "--dependency agentic-payment-skills"
     ]
   },
   {
@@ -181,7 +210,7 @@ const moduleExpectations = [
       "integration checklist",
       "payment handoff contract skeleton",
       "generic agent adapter checklist",
-      "agent-payment-skills dependency checklist",
+      "agentic-payment-skills dependency checklist",
       "contract validation report",
       "launch-readiness checklist",
       "production promotion plan",

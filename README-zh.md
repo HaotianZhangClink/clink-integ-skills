@@ -21,7 +21,7 @@
 你可以用这个 skill 来：
 
 - 设计标准接入流程，包括注册商品模式下的商品和价格选择、checkout session 创建、面向订阅的购买路径分流、webhook 契约审查，以及可选的通过 JS SDK 接入 embedded form
-- 设计商户 Skill for 通用 Agent 接入，使用 `agent-payment-skills` / `clink-payment-skill`，包括 `clink-cli` 依赖、adapter contract、支付执行、callback 和任务恢复
+- 设计商户 Skill for 通用 Agent 接入，使用 `agentic-payment-skills` / `clink-payment-skill`，包括 `clink-cli` 依赖、adapter contract、支付执行、callback 和任务恢复
 - 设计商户 Skill for OpenClaw 接入，使用 `openclaw-payment-skills`，包括商户 skill 接入，以及商户后端通过 `customer.verify` 支持 email verify webhook
 - 基于 Clink 官方文档回答问题，并提取相关 endpoint、field、webhook 和契约细节
 - 审查商户 Skill 接入场景下的 payment handoff 契约
@@ -45,16 +45,18 @@
 对于商户 Skill for 通用 Agent 接入，默认范围包括：
 
 - 识别目标 agent runtime，以及是否需要 adapter 层
+- 在生成或审查代码前加载最新可用的 `agentic-payment-skills` 上下文
 - 定义 merchant skill 或 merchant tool 在 generic agent runtime 里的职责
-- 定义 generic agent 如何调用 `agent-payment-skills` / `clink-payment-skill`
-- 支持商户返回 `402 Payment Required` 后，把结构化支付需求 handoff 给 `agent-payment-skills`
+- 定义 generic agent 如何调用 `agentic-payment-skills` / `clink-payment-skill`
+- 支持商户返回 `402 Payment Required` 后，把结构化支付需求 handoff 给 `agentic-payment-skills`
 - 定义 payment invocation、merchant confirmation、callback 和任务恢复契约
-- 拆清 generic agent runtime、adapter、merchant server 和 `agent-payment-skills` 的职责边界
+- 拆清 generic agent runtime、adapter、merchant server 和 `agentic-payment-skills` 的职责边界
 - 定义 handoff、callback、webhook 和 confirmation 路径的幂等与重复投递处理
 - 保持 `clink-payment-skill` 边界：它执行 wallet/card/pay/refund/risk-rule 操作，但不决定定价、权益或商户收款/充值确认
 
 对于商户 Skill for OpenClaw 接入，默认范围包括：
 
+- 在生成或审查代码前加载最新可用的 `openclaw-payment-skills` 上下文
 - 定义 merchant skill 在 OpenClaw runtime 里的职责
 - 定义 merchant skill 如何调用 `openclaw-payment-skills`
 - 定义 session mode 或 direct mode 支付准备方式
@@ -83,7 +85,7 @@
 
 - `帮我设计 checkout + webhook + refund 的标准接入方案`
 - `帮我设计注册商品模式接入，包含商品/价格选择、checkout、webhook 和 customer portal 兜底分流`
-- `帮我设计通过 agent-payment-skills 的自研 agent runtime 商户 Skill for 通用 Agent 接入，包含 clink-cli 支付执行、callback 和任务恢复`
+- `帮我设计通过 agentic-payment-skills 的自研 agent runtime 商户 Skill for 通用 Agent 接入，包含 clink-cli 支付执行、callback 和任务恢复`
 - `帮我设计通过 openclaw-payment-skills 的商户 Skill for OpenClaw 接入，包含 merchant skill handoff 和 customer.verify 邮箱验证 webhook 支持`
 - `基于官方文档解释这个字段是什么意思`
 - `审查这个 payment handoff contract`
@@ -102,6 +104,7 @@
 | `references/output-artifacts.md` | 开发者输出工件规范 |
 | `references/validation-workflow.md` | 校验工作流 |
 | `references/review-checklist.md` | 审核清单与质量门槛 |
+| `scripts/load_payment_skill_contexts.mjs` | payment skill 上下文刷新与缓存加载 |
 
 ---
 
@@ -131,6 +134,15 @@
 - integration 相关内容
 - API reference 相关内容
 - webhook 相关内容
+
+对于商户 Skill 接入路径，这个 skill 还会在生成代码或 review 前刷新 payment skill 上下文：
+
+```bash
+node scripts/load_payment_skill_contexts.mjs --dependency agentic-payment-skills --print-path
+node scripts/load_payment_skill_contexts.mjs --dependency openclaw-payment-skills --print-path
+```
+
+通用 Agent 接入 review 时，加载并阅读 `agentic-payment-skills`。OpenClaw Agent 接入 review 时，加载并阅读 `openclaw-payment-skills`。这个脚本会通过 GitHub codeload zip 把指定上下文下载到 `.cache/payment-skill-contexts/`，记录来源 metadata，并避免修改旁边的 payment skill 工作区。如果 zip 下载失败，它会回退到本地 sibling skill 文件，并标记该上下文不是已确认最新版本。
 
 ---
 
@@ -167,6 +179,7 @@ git clone https://github.com/clinkbillcom/clink-integ-skills.git ~/.codex/skills
 
 ```bash
 node scripts/load_official_docs.mjs --json
+node scripts/load_payment_skill_contexts.mjs --json
 node scripts/lint_contract.mjs path/to/contract.json
 node scripts/lint_webhook_design.mjs path/to/design.md
 node scripts/generate_guidance_artifacts.mjs --prompt "帮我设计 Clink webhook 接入"
@@ -176,6 +189,7 @@ node scripts/run_skill_runtime.mjs --prompt "Review this payment handoff contrac
 这些脚本提供：
 
 - 文档门禁
+- `agentic-payment-skills` 和 `openclaw-payment-skills` 上下文刷新
 - 契约校验
 - webhook 设计校验
 - 接入工件生成

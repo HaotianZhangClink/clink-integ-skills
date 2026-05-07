@@ -19,7 +19,7 @@ This skill is modular:
 This skill covers three primary integration paths:
 
 - standard integration, including checkout session creation, webhook contract review, and optional embedded form integration through JS SDK
-- merchant skill for generic agent integration, including non-OpenClaw agent runtime contracts through `agent-payment-skills`, adapter design, `clink-cli` payment execution, callback, and task resume behavior
+- merchant skill for generic agent integration, including non-OpenClaw agent runtime contracts through `agentic-payment-skills`, adapter design, `clink-cli` payment execution, callback, and task resume behavior
 - merchant skill for OpenClaw integration, including OpenClaw merchant skill integration through `openclaw-payment-skills` and merchant backend webhook support for email verification
 
 It also provides support capabilities for:
@@ -67,6 +67,7 @@ Use this path when the user wants help with:
 Read:
 
 - `references/retrieval-protocol.md`
+- run `node scripts/load_payment_skill_contexts.mjs --dependency openclaw-payment-skills --print-path`, then read the generated OpenClaw payment skill context
 - `references/agent-integration.md`
 
 After drafting the solution, review it with:
@@ -80,10 +81,10 @@ Use this path when the user wants help with:
 
 - a merchant skill or merchant tool running inside a non-OpenClaw agent runtime
 - a merchant or platform agent that is not tied to OpenClaw
-- a generic agent runtime, third-party agent, custom orchestrator, or chat agent using `agent-payment-skills`
+- a generic agent runtime, third-party agent, custom orchestrator, or chat agent using `agentic-payment-skills`
 - `clink-payment-skill` and `clink-cli` dependency design
-- adapter design between the agent runtime and `agent-payment-skills`
-- merchant `402 Payment Required` handoff from a merchant API or tool into `agent-payment-skills`
+- adapter design between the agent runtime and `agentic-payment-skills`
+- merchant `402 Payment Required` handoff from a merchant API or tool into `agentic-payment-skills`
 - callback, polling, queue, or recovery design for payment completion
 - agent task resume behavior after merchant confirmation
 - generic payment handoff contracts
@@ -91,6 +92,7 @@ Use this path when the user wants help with:
 Read:
 
 - `references/retrieval-protocol.md`
+- run `node scripts/load_payment_skill_contexts.mjs --dependency agentic-payment-skills --print-path`, then read the generated generic agent payment skill context
 - `references/generic-agent-integration.md`
 
 After drafting the solution, review it with:
@@ -139,6 +141,8 @@ After drafting the answer, review it with:
 
 - run doc-dependent work through `node scripts/load_official_docs.mjs`
 - treat docs loading as a check-and-refresh gate, not as an unconditional refresh step
+- for merchant skill for OpenClaw integration, run `node scripts/load_payment_skill_contexts.mjs --dependency openclaw-payment-skills --print-path` before generating code, integration guidance, or review output, then read the generated payment skill context
+- for merchant skill for generic agent integration, run `node scripts/load_payment_skill_contexts.mjs --dependency agentic-payment-skills --print-path` before generating code, integration guidance, or review output, then read the generated payment skill context
 - prefer the smallest set of local docs needed for the task
 - route the request to the correct scenario before designing the flow
 - read only the modules needed for the current task
@@ -147,7 +151,7 @@ After drafting the answer, review it with:
 - if the user asks for implementation guidance, help the coding agent decide what to build before attempting project-specific code
 - for standard integration, clarify product mode before designing checkout creation
 - for merchant skill for OpenClaw integration, separate merchant skill, merchant server, and `openclaw-payment-skills` responsibilities
-- for merchant skill for generic agent integration, separate merchant skill or tool, agent runtime, adapter, merchant server, `agent-payment-skills`, callback, and resume responsibilities
+- for merchant skill for generic agent integration, separate merchant skill or tool, agent runtime, adapter, merchant server, `agentic-payment-skills`, callback, and resume responsibilities
 - when the user asks for developer help, prefer producing executable artifacts such as checklists, sample payloads, contract skeletons, and validation reports
 - for validation tasks, prefer `node scripts/lint_contract.mjs`, `node scripts/lint_webhook_design.mjs`, and `node scripts/generate_guidance_artifacts.mjs`
 - resolve the target environment before generating any code or configuration; use the resolved base URL in all generated code
@@ -158,7 +162,9 @@ After drafting the answer, review it with:
 - use only "sandbox" and "production" as user-facing environment terms; do not expose internal naming such as "uat" or "prod" unless the output specifically targets developers who need the internal mapping
 - do not generate production rollout guidance or production base URLs before the production validation gate completes successfully
 - if the current task needs official docs, do not read or cite the cached official docs before running the freshness check command
+- if the current task depends on `agentic-payment-skills` or `openclaw-payment-skills`, do not generate or review code from static memory alone; refresh and read the latest available payment skill context first
 - running `node scripts/load_official_docs.mjs` means: use cache if it is within 7 days, refresh only if missing or older than 7 days, and fall back to stale cache only when refresh fails
+- running `node scripts/load_payment_skill_contexts.mjs` means: download the latest GitHub codeload zip payment skill context into this skill's `.cache` when possible, never mutate sibling payment skill worktrees, and fall back to local sibling skill files only with an explicit warning
 - do not mix standard integration, merchant skill for generic agent integration, and merchant skill for OpenClaw integration unless the user explicitly wants multiple paths
 - do not treat `merchantReferenceId` as an idempotency key
 - do not describe webhook handling without dashboard subscription, endpoint registration, signature verification, idempotency, retry handling, and out-of-order tolerance
