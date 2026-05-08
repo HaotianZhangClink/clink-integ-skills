@@ -118,7 +118,16 @@ The merchant should:
 
 1. subscribe to required events
 2. register the HTTPS webhook endpoint
-3. obtain the webhook signing key
+3. open the registered webhook endpoint details and copy the webhook signing key
+4. store the webhook signing key in the merchant server's secret manager or environment configuration
+
+When asking a user for a webhook signing key, also tell them the retrieval path and method: go to `Merchant Dashboard > Developers > Webhooks`, register or select the HTTPS endpoint, then copy the signing key shown for that endpoint. Do not ask the user to paste the real signing key into chat or generated code; ask them to configure a placeholder such as `CLINK_WEBHOOK_SIGNING_KEY`.
+
+### Step 5a: Configure Server Secret Key
+
+Server-side API calls require a Clink Secret Key.
+
+When asking a user for a Secret Key, also tell them the retrieval path and method: go to `Merchant Dashboard > Developers > API Keys`, click `Initialize Key`, then copy and securely store the Secret Key because it is displayed only once. Do not put the real Secret Key in frontend code, chat, generated source, docs, or public repositories; use a secret manager or environment variable such as `CLINK_SECRET_KEY`.
 
 #### Server Implementation
 

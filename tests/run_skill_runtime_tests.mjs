@@ -77,7 +77,7 @@ async function main() {
 
   const validation = await runSkillRuntime({
     prompt: "Validate this webhook design before launch.",
-    validationInput: "We will use Merchant Dashboard > Developers > Webhooks, subscribe to required events, register an HTTPS endpoint, store the webhook signing key, verify X-Clink-Timestamp and X-Clink-Signature, implement idempotency, retries, and out-of-order handling.",
+    validationInput: "We will use Merchant Dashboard > Developers > Webhooks, subscribe to required events, register an HTTPS endpoint, select the registered endpoint, copy the webhook signing key, and store it as CLINK_WEBHOOK_SIGNING_KEY, verify X-Clink-Timestamp and X-Clink-Signature, implement idempotency, retries, and out-of-order handling.",
     docsFallbackSource: docsFallback,
   });
   check(validation.route === "integration_validation", "validation prompt should route to integration_validation");
@@ -217,7 +217,7 @@ async function main() {
   // Integration: scripted validation alone is not sufficient for production promotion
   const prodScriptedOnly = await runSkillRuntime({
     prompt: "Deploy to production our Clink checkout webhook integration.",
-    validationInput: "We will use Merchant Dashboard > Developers > Webhooks, subscribe to required events, register an HTTPS endpoint, store the webhook signing key, verify X-Clink-Timestamp and X-Clink-Signature, implement idempotency, retries, and out-of-order handling.",
+    validationInput: "We will use Merchant Dashboard > Developers > Webhooks, subscribe to required events, register an HTTPS endpoint, select the registered endpoint, copy the webhook signing key, and store it as CLINK_WEBHOOK_SIGNING_KEY, verify X-Clink-Timestamp and X-Clink-Signature, implement idempotency, retries, and out-of-order handling.",
     docsFallbackSource: docsFallback,
   });
   check(prodScriptedOnly.productionValidation?.passed === false, "scripted validation without semantic sign-off should not pass production validation");
@@ -230,7 +230,7 @@ async function main() {
 
   const prodValidationScriptedOnly = await runSkillRuntime({
     prompt: "Validate this webhook design before deploy to production.",
-    validationInput: "We will use Merchant Dashboard > Developers > Webhooks, subscribe to required events, register an HTTPS endpoint, store the webhook signing key, verify X-Clink-Timestamp and X-Clink-Signature, implement idempotency, retries, and out-of-order handling.",
+    validationInput: "We will use Merchant Dashboard > Developers > Webhooks, subscribe to required events, register an HTTPS endpoint, select the registered endpoint, copy the webhook signing key, and store it as CLINK_WEBHOOK_SIGNING_KEY, verify X-Clink-Timestamp and X-Clink-Signature, implement idempotency, retries, and out-of-order handling.",
     docsFallbackSource: docsFallback,
   });
   check(prodValidationScriptedOnly.route === "integration_validation", "production validation prompt should still route to integration_validation");
@@ -243,7 +243,7 @@ async function main() {
 
   const prodValidationApproved = await runSkillRuntime({
     prompt: "Validate this webhook design before deploy to production.",
-    validationInput: "We will use Merchant Dashboard > Developers > Webhooks, subscribe to required events, register an HTTPS endpoint, store the webhook signing key, verify X-Clink-Timestamp and X-Clink-Signature, implement idempotency, retries, and out-of-order handling.",
+    validationInput: "We will use Merchant Dashboard > Developers > Webhooks, subscribe to required events, register an HTTPS endpoint, select the registered endpoint, copy the webhook signing key, and store it as CLINK_WEBHOOK_SIGNING_KEY, verify X-Clink-Timestamp and X-Clink-Signature, implement idempotency, retries, and out-of-order handling.",
     semanticValidation: {
       ownershipBoundary: true,
       environmentCompleteness: true,
@@ -270,7 +270,7 @@ async function main() {
   // Integration: production with valid webhook input and semantic validation
   const prodValid = await runSkillRuntime({
     prompt: "Deploy to production our Clink checkout webhook integration.",
-    validationInput: "We will use Merchant Dashboard > Developers > Webhooks, subscribe to required events, register an HTTPS endpoint, store the webhook signing key, verify X-Clink-Timestamp and X-Clink-Signature, implement idempotency, retries, and out-of-order handling.",
+    validationInput: "We will use Merchant Dashboard > Developers > Webhooks, subscribe to required events, register an HTTPS endpoint, select the registered endpoint, copy the webhook signing key, and store it as CLINK_WEBHOOK_SIGNING_KEY, verify X-Clink-Timestamp and X-Clink-Signature, implement idempotency, retries, and out-of-order handling.",
     semanticValidation: {
       ownershipBoundary: true,
       environmentCompleteness: true,
@@ -403,7 +403,7 @@ async function main() {
 
   const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "clink-runtime-"));
   const validationFile = path.join(tempRoot, "webhook.txt");
-  fs.writeFileSync(validationFile, "We will use Merchant Dashboard > Developers > Webhooks, subscribe to required events, register an HTTPS endpoint, store the webhook signing key, verify X-Clink-Timestamp and X-Clink-Signature, implement idempotency, retries, and out-of-order handling.", "utf8");
+  fs.writeFileSync(validationFile, "We will use Merchant Dashboard > Developers > Webhooks, subscribe to required events, register an HTTPS endpoint, select the registered endpoint, copy the webhook signing key, and store it as CLINK_WEBHOOK_SIGNING_KEY, verify X-Clink-Timestamp and X-Clink-Signature, implement idempotency, retries, and out-of-order handling.", "utf8");
   const cliConfirmedSkipArgs = [
     runtimeScript,
     "--prompt",

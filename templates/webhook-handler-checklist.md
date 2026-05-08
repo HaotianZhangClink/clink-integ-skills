@@ -2,7 +2,7 @@
 
 - Subscribe to required events in `Merchant Dashboard > Developers > Webhooks`
 - Register the HTTPS webhook endpoint
-- Obtain and store the webhook signing key securely
+- Obtain the webhook signing key from `Merchant Dashboard > Developers > Webhooks` by selecting the registered endpoint, then store it securely as `CLINK_WEBHOOK_SIGNING_KEY`
 - Verify `X-Clink-Timestamp`
 - Verify `X-Clink-Signature`
 - Reject stale or replayed deliveries

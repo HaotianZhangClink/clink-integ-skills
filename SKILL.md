@@ -167,6 +167,8 @@ After drafting the answer, review it with:
 - running `node scripts/load_payment_skill_contexts.mjs` means: download the latest GitHub codeload zip payment skill context into this skill's `.cache` when possible, never mutate sibling payment skill worktrees, and fall back to local sibling skill files only with an explicit warning
 - do not mix standard integration, merchant skill for generic agent integration, and merchant skill for OpenClaw integration unless the user explicitly wants multiple paths
 - do not treat `merchantReferenceId` as an idempotency key
+- when asking the user to provide or configure a webhook signing key or Secret Key, state the dashboard path and method: webhook signing key comes from `Merchant Dashboard > Developers > Webhooks` after registering/selecting the webhook endpoint; Secret Key comes from `Merchant Dashboard > Developers > API Keys` by clicking `Initialize Key`, then copying and securely storing the key because it is displayed only once
+- prefer environment variables or secret-manager placeholders for webhook signing keys and Secret Keys; do not ask the user to paste real secrets into chat, generated source code, docs, or public repositories
 - do not describe webhook handling without dashboard subscription, endpoint registration, signature verification, idempotency, retry handling, and out-of-order tolerance
 - do not assume a public refund-create API unless local docs explicitly show one
 - do not describe merchant skill integration as a plain checkout redirect flow

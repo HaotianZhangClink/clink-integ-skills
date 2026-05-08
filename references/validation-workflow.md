@@ -22,7 +22,7 @@ For standard integration webhook validation:
 
 1. confirm dashboard subscription scope
 2. confirm endpoint registration
-3. confirm signing key handling
+3. confirm signing key retrieval path and handling: `Merchant Dashboard > Developers > Webhooks`, register or select the HTTPS endpoint, then copy the endpoint signing key into secure server configuration
 4. confirm header verification for `X-Clink-Timestamp` and `X-Clink-Signature`
 5. confirm idempotency, retry safety, and out-of-order tolerance
 6. emit remediation items for missing controls
@@ -99,3 +99,6 @@ Before emitting any code output, verify:
 - no `https://api.clinkbill.com` appears in sandbox code
 - no `https://uat-api.clinkbill.com` appears in production code
 - environment-specific secrets reference the correct environment via placeholders
+- any request for a webhook signing key includes the dashboard path and method: `Merchant Dashboard > Developers > Webhooks`, register or select the webhook endpoint, then copy the endpoint signing key
+- any request for a Secret Key includes the dashboard path and method: `Merchant Dashboard > Developers > API Keys`, click `Initialize Key`, copy the Secret Key, and store it securely because it is shown only once
+- real webhook signing keys and Secret Keys are never requested in chat or emitted into generated source, docs, logs, or public repositories

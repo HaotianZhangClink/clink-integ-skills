@@ -37,11 +37,24 @@ function main() {
   const validWebhook = lintWebhookDesign(`
     Start in Merchant Dashboard > Developers > Webhooks.
     Subscribe to required events and register your HTTPS endpoint.
-    Store the webhook signing key.
+    Select the registered endpoint, copy the webhook signing key, and store it as CLINK_WEBHOOK_SIGNING_KEY.
     Verify X-Clink-Timestamp and X-Clink-Signature.
     Make processing idempotent, handle retries, and tolerate out-of-order delivery.
   `);
   check(validWebhook.valid === true, "complete webhook design should pass linting");
+
+  const missingWebhookKeyMethod = lintWebhookDesign(`
+    Start in Merchant Dashboard > Developers > Webhooks.
+    Subscribe to required events and register your HTTPS endpoint.
+    Store the webhook signing key.
+    Verify X-Clink-Timestamp and X-Clink-Signature.
+    Make processing idempotent, handle retries, and tolerate out-of-order delivery.
+  `);
+  check(missingWebhookKeyMethod.valid === false, "webhook design without signing key retrieval method should fail linting");
+  check(
+    missingWebhookKeyMethod.errors.some((item) => item.includes("signing key retrieval method")),
+    "webhook design without signing key retrieval method should report missing retrieval method"
+  );
 
   const invalidWebhook = lintWebhookDesign("We only redirect from the frontend after checkout succeeds.");
   check(invalidWebhook.valid === false, "frontend-only webhook design should fail linting");

@@ -26,6 +26,9 @@ This file is for final review and self-check. It is not the primary workflow doc
 - does the design avoid treating `merchantReferenceId` as an idempotency key
 - does the design keep `originalAmount` aligned with the merchant-defined checkout payload
 - does webhook implementation include dashboard subscription and endpoint registration
+- when a webhook signing key is requested or configured, does the output tell the user to get it from `Merchant Dashboard > Developers > Webhooks` by registering or selecting the webhook endpoint and copying the endpoint signing key
+- when a Secret Key is requested or configured, does the output tell the user to get it from `Merchant Dashboard > Developers > API Keys` by clicking `Initialize Key`, copying it once, and storing it securely
+- does the output avoid asking the user to paste real webhook signing keys or Secret Keys into chat, generated source code, docs, logs, or public repositories
 - does webhook coverage include subscription lifecycle events when the product mode is subscription-based
 - does webhook coverage include `order.refunded` or equivalent refunded-state handling when that state exists in the merchant order model
 - does webhook implementation include signature verification, idempotency, retry handling, and out-of-order tolerance

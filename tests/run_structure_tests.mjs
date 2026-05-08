@@ -117,6 +117,8 @@ const moduleExpectations = [
       "embedded form",
       "configured link opening",
       "Merchant Dashboard > Developers > Webhooks",
+      "Merchant Dashboard > Developers > API Keys",
+      "Initialize Key",
       "X-Clink-Timestamp",
       "X-Clink-Signature",
       "refund lifecycle"
@@ -191,7 +193,9 @@ const moduleExpectations = [
       "refund",
       "load_payment_skill_contexts",
       "--dependency openclaw-payment-skills",
-      "--dependency agentic-payment-skills"
+      "--dependency agentic-payment-skills",
+      "Merchant Dashboard > Developers > Webhooks",
+      "Merchant Dashboard > Developers > API Keys"
     ]
   },
   {
