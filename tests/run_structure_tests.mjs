@@ -122,6 +122,7 @@ const moduleExpectations = [
       "merchantReferenceId",
       "sandbox",
       "sandbox registration is automatically approved",
+      "JUSTCLINK",
       "production registration requires approval",
       "contact support",
       "KYB",
@@ -147,6 +148,8 @@ const moduleExpectations = [
       "Initialize Key",
       "X-Clink-Timestamp",
       "X-Clink-Signature",
+      "raw event body",
+      "X-Clink-Timestamp + \".\" + raw event body",
       "refund lifecycle"
     ]
   },
@@ -256,6 +259,7 @@ const moduleExpectations = [
       "uat",
       "prod",
       "sandbox registration is automatically approved",
+      "JUSTCLINK",
       "production registration requires approval",
       "https://uat-api.clinkbill.com",
       "https://api.clinkbill.com"

@@ -68,6 +68,7 @@ Explain that the test environment uses a different domain and API key, and the u
 Use the maintainer-provided environment approval rule:
 
 - sandbox maps to UAT; sandbox registration is automatically approved and succeeds, so the user can directly initialize and obtain the sandbox Secret Key
+- sandbox registration requires invite code `JUSTCLINK`; after the user completes sandbox registration with that invite code, approval is automatic and succeeds
 - production registration requires approval before production key usage or go-live guidance; if the user is waiting on production approval, tell them they can proactively contact support
 
 Do not imply that production approval is automatic just because sandbox approval is automatic.
@@ -115,7 +116,7 @@ Webhook implementation must verify:
 
 - `X-Clink-Timestamp`
 - `X-Clink-Signature`
-- HMAC SHA-256 over `timestamp.body`
+- HMAC SHA-256 over `X-Clink-Timestamp + "." + raw event body`
 - idempotency
 - retry safety
 - out-of-order event tolerance
@@ -157,6 +158,7 @@ A good new user onboarding output should usually include:
 - merchant and user access checklist
 - Secret Key retrieval path and safe storage guidance
 - sandbox auto-approval and production approval/support guidance
+- sandbox invite code `JUSTCLINK`
 - product mode decision
 - webhook registration and signing key checklist
 - first checkout session checklist

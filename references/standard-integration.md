@@ -136,7 +136,8 @@ The merchant backend should:
 - expose an HTTPS endpoint
 - read `X-Clink-Timestamp`
 - read `X-Clink-Signature`
-- verify the payload with the signing key
+- preserve the raw event body before JSON parsing
+- verify HMAC SHA-256 over `X-Clink-Timestamp + "." + raw event body` with the webhook signing key
 - implement idempotency
 - handle retries safely
 - tolerate out-of-order delivery

@@ -50,6 +50,7 @@ The skill should not silently produce production guidance for a generic integrat
 Use these maintainer-provided rules when explaining environment readiness:
 
 - sandbox maps to the UAT environment; sandbox registration is automatically approved and succeeds, so the user can proceed directly to `Merchant Dashboard > Developers > API Keys` and initialize the sandbox Secret Key
+- sandbox registration requires invite code `JUSTCLINK`; after registration with that invite code, sandbox approval is automatic and succeeds
 - production registration requires approval before production key usage or go-live guidance; if the user is waiting on production approval, tell them they can proactively contact support
 
 Do not turn the sandbox auto-approval rule into a production approval guarantee. Do not generate production rollout guidance before the production validation gate passes.
