@@ -45,6 +45,15 @@ The skill resolves the mapping internally before generating any code. The develo
 
 The skill should not silently produce production guidance for a generic integration request.
 
+## Environment Approval Rules
+
+Use these maintainer-provided rules when explaining environment readiness:
+
+- sandbox maps to the UAT environment; sandbox registration is automatically approved and succeeds, so the user can proceed directly to `Merchant Dashboard > Developers > API Keys` and initialize the sandbox Secret Key
+- production registration requires approval before production key usage or go-live guidance; if the user is waiting on production approval, tell them they can proactively contact support
+
+Do not turn the sandbox auto-approval rule into a production approval guarantee. Do not generate production rollout guidance before the production validation gate passes.
+
 ## Environment Detection
 
 Environment is detected from the user's prompt semantics, similar to the existing `getRouteSignals()` pattern in `skill-runtime.mjs`. There is no explicit environment parameter — the skill infers intent from natural language.

@@ -20,6 +20,7 @@ const requiredFiles = [
   "lib/validators.mjs",
   "lib/skill-runtime.mjs",
   "references/retrieval-protocol.md",
+  "references/new-user-onboarding.md",
   "references/standard-integration.md",
   "references/agent-integration.md",
   "references/generic-agent-integration.md",
@@ -49,6 +50,7 @@ const moduleExpectations = [
     file: "SKILL.md",
     contains: [
       "standard integration",
+      "new user onboarding",
       "merchant skill for generic agent integration",
       "merchant skill for OpenClaw integration",
       "openclaw-payment-skills",
@@ -59,6 +61,7 @@ const moduleExpectations = [
       "customer.verify",
       "node scripts/load_official_docs.mjs",
       "node scripts/load_payment_skill_contexts.mjs",
+      "references/new-user-onboarding.md",
       "--dependency openclaw-payment-skills",
       "--dependency agentic-payment-skills",
       "guidance artifacts",
@@ -100,6 +103,29 @@ const moduleExpectations = [
       "generic agent review",
       "CLINK_AGENTIC_PAYMENT_SKILLS_URL",
       "CLINK_OPENCLAW_PAYMENT_SKILLS_URL"
+    ]
+  },
+  {
+    file: "references/new-user-onboarding.md",
+    contains: [
+      "node scripts/load_official_docs.mjs",
+      "Merchant Dashboard > Developers > API Keys",
+      "Initialize Key",
+      "Merchant Dashboard > Developers > Webhooks",
+      "Settings > Merchant",
+      "Settings > Users",
+      "Products",
+      "TOTP",
+      "registered product mode",
+      "non-registered product mode",
+      "priceDataList",
+      "merchantReferenceId",
+      "sandbox",
+      "sandbox registration is automatically approved",
+      "production registration requires approval",
+      "contact support",
+      "KYB",
+      "KYC"
     ]
   },
   {
@@ -212,6 +238,7 @@ const moduleExpectations = [
     file: "references/output-artifacts.md",
     contains: [
       "integration checklist",
+      "onboarding checklist",
       "payment handoff contract skeleton",
       "generic agent adapter checklist",
       "agentic-payment-skills dependency checklist",
@@ -228,6 +255,8 @@ const moduleExpectations = [
       "production",
       "uat",
       "prod",
+      "sandbox registration is automatically approved",
+      "production registration requires approval",
       "https://uat-api.clinkbill.com",
       "https://api.clinkbill.com"
     ]

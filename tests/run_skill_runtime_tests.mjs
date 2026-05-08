@@ -68,6 +68,34 @@ async function main() {
   check(docsQuestion.notes.some((item) => item.includes("refund-create API")), "docs question should warn that refund-create API is not confirmed");
   check(docsQuestion.route === "documentation_dialogue", "public API question should route to documentation_dialogue");
 
+  const onboarding = await runSkillRuntime({
+    prompt: "Create a new user onboarding plan for a merchant starting from zero with Clink quickstart.",
+    docsFallbackSource: docsFallback,
+  });
+  check(onboarding.route === "merchant_new_user_onboarding", "new user onboarding prompt should route to merchant_new_user_onboarding");
+  check(onboarding.docsGateInvoked === true, "new user onboarding should invoke docs gate");
+  check(onboarding.artifacts.some((item) => item.name === "new_user_onboarding_checklist"), "new user onboarding should emit onboarding checklist artifact");
+  check(onboarding.artifacts.some((item) => item.name === "secret_setup_checklist"), "new user onboarding should emit secret setup checklist artifact");
+  check(onboarding.notes.some((item) => item.includes("docs-confirmed")), "new user onboarding should record docs-confirmed scope note");
+
+  const onboardingReadiness = await runSkillRuntime({
+    prompt: "Validate new user onboarding readiness before launch.",
+    docsFallbackSource: docsFallback,
+  });
+  check(onboardingReadiness.route === "integration_validation", "validation intent should take priority over onboarding route");
+
+  const productionOnboarding = await runSkillRuntime({
+    prompt: "Create a go live onboarding plan for a new user starting from zero with Clink.",
+    docsFallbackSource: docsFallback,
+  });
+  check(productionOnboarding.route === "merchant_new_user_onboarding", "production onboarding prompt should still route to onboarding guidance");
+  check(productionOnboarding.environment?.targetEnvironment === "sandbox", "onboarding route should keep production requests in sandbox");
+  check(productionOnboarding.productionValidation === null, "onboarding route should not run production validation directly");
+  check(
+    productionOnboarding.notes.some((item) => item.includes("Production onboarding requests stay in sandbox")),
+    "production onboarding should add sandbox and validation routing note"
+  );
+
   const comparison = await runSkillRuntime({
     prompt: "Compare a merchant standard integration and a merchant agent integration for the same product.",
     docsFallbackSource: docsFallback,

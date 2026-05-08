@@ -4,9 +4,10 @@
 
 `clink-integ-skills` 是一个模块化的 skill，用于指导 coding agent 完成 Clink 接入、校验接入决策、审查现有方案，以及回答基于官方文档的接入问题。
 
-它围绕三条核心接入路径构建：
+它围绕四条核心指导路径构建：
 
 - 标准接入
+- 新用户 onboarding
 - 商户 Skill for 通用 Agent 接入
 - 商户 Skill for OpenClaw 接入
 
@@ -21,6 +22,7 @@
 你可以用这个 skill 来：
 
 - 设计标准接入流程，包括注册商品模式下的商品和价格选择、checkout session 创建、面向订阅的购买路径分流、webhook 契约审查，以及可选的通过 JS SDK 接入 embedded form
+- 为新用户提供基于文档的首次接入指导，包括账号访问、MFA、merchant 选择、Secret Key 设置、商品模式选择、webhook 注册和首次 checkout 准备
 - 设计商户 Skill for 通用 Agent 接入，使用 `agentic-payment-skills` / `clink-payment-skill`，包括 `clink-cli` 依赖、adapter contract、支付执行、callback 和任务恢复
 - 设计商户 Skill for OpenClaw 接入，使用 `openclaw-payment-skills`，包括商户 skill 接入，以及商户后端通过 `customer.verify` 支持 email verify webhook
 - 基于 Clink 官方文档回答问题，并提取相关 endpoint、field、webhook 和契约细节
@@ -35,6 +37,16 @@
 - webhook 契约审查与商户 webhook 处理
 - 订阅生命周期 webhook 覆盖，以及必要时在回跳后主动同步状态
 - 可选的商户前端通过 JS SDK 接入 embedded form，或通过配置好的链接打开支付流程
+
+对于新用户 onboarding，默认范围包括：
+
+- 基于 quickstart 文档指导账号邀请、密码设置和 MFA
+- 在 `Settings > Merchant` 确认 merchant 选择和 merchant profile
+- 在 `Settings > Users` 配置用户与角色
+- 通过 `Merchant Dashboard > Developers > API Keys` 和 `Initialize Key` 获取 Secret Key
+- 首次 checkout 前确认商品模式
+- 在 `Merchant Dashboard > Developers > Webhooks` 注册 webhook
+- 准备首次 sandbox checkout session，并把用户路由到后续正确接入路径
 
 对于基于文档的接入指导，默认范围包括：
 
@@ -84,6 +96,7 @@
 示例：
 
 - `帮我设计 checkout + webhook + refund 的标准接入方案`
+- `帮我给从零开始的 Clink 新用户设计 onboarding 指南`
 - `帮我设计注册商品模式接入，包含商品/价格选择、checkout、webhook 和 customer portal 兜底分流`
 - `帮我设计通过 agentic-payment-skills 的自研 agent runtime 商户 Skill for 通用 Agent 接入，包含 clink-cli 支付执行、callback 和任务恢复`
 - `帮我设计通过 openclaw-payment-skills 的商户 Skill for OpenClaw 接入，包含 merchant skill handoff 和 customer.verify 邮箱验证 webhook 支持`
@@ -98,6 +111,7 @@
 |---|---|
 | `SKILL.md` | 主控路由与全局规则 |
 | `references/retrieval-protocol.md` | 本地文档检索协议 |
+| `references/new-user-onboarding.md` | 基于文档的新用户 onboarding 工作流 |
 | `references/standard-integration.md` | 标准接入工作流 |
 | `references/generic-agent-integration.md` | 商户 Skill for 通用 Agent 接入工作流 |
 | `references/agent-integration.md` | 商户 Skill for OpenClaw 接入工作流 |

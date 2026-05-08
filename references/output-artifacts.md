@@ -20,6 +20,17 @@ For non-registered product mode, add:
 
 - inline payload design notes such as `priceDataList`
 
+## New User Onboarding Artifacts
+
+A strong new user onboarding output should usually include:
+
+- onboarding checklist for account access, password setup, MFA, merchant selection, and team access
+- dashboard setup checklist covering merchant profile, users, products, API keys, and webhooks
+- secret setup checklist covering Secret Key retrieval, webhook signing key retrieval, and safe storage placeholders
+- product mode decision checklist for registered product mode vs non-registered product mode
+- first checkout smoke-test checklist for sandbox checkout session creation and post-checkout verification
+- next-path recommendation that routes the user to standard integration, generic agent integration, OpenClaw integration, or validation
+
 ## Merchant Skill for OpenClaw Integration Artifacts
 
 A strong merchant skill for OpenClaw integration output should usually include:

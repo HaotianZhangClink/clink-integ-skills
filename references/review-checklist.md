@@ -36,6 +36,20 @@ This file is for final review and self-check. It is not the primary workflow doc
 - does the design clearly separate payment confirmation from merchant fulfillment when downstream delivery exists
 - does refund handling describe lifecycle behavior instead of assuming unsupported create APIs
 
+## New User Onboarding Checks
+
+- does onboarding guidance load official docs before giving exact dashboard paths or setup steps
+- does it default setup and first checkout guidance to `sandbox`
+- does it explain invited-user verification, password setup, and MFA without asking for sensitive values
+- does it tell the user to confirm merchant selection and merchant profile under `Settings > Merchant`
+- does it explain team access through `Settings > Users` and avoid giving Developer access to roles that docs say do not have it
+- does it include Secret Key retrieval through `Merchant Dashboard > Developers > API Keys` and `Initialize Key`
+- does it include webhook registration and signing key retrieval through `Merchant Dashboard > Developers > Webhooks`
+- does it distinguish registered product mode from non-registered product mode before first checkout setup
+- does it explain that subscription recurring payments require pre-created products according to the checkout docs
+- does it route the user to standard integration, generic agent integration, OpenClaw integration, or validation after onboarding
+- does it avoid inventing KYB, KYC, production activation, payout, or merchant approval details beyond docs-confirmed facts
+
 ## Merchant Skill for OpenClaw Integration Checks
 
 - does the design use `openclaw-payment-skills` for the OpenClaw payment skill path

@@ -4,9 +4,10 @@ English | [简体中文](README-zh.md)
 
 `clink-integ-skills` is a modular skill for guiding a coding agent through Clink integrations, validating integration decisions, reviewing existing designs, and answering documentation-backed integration questions.
 
-It is built around three primary integration paths:
+It is built around four primary guidance paths:
 
 - standard integration
+- new user onboarding
 - merchant skill for generic agent integration
 - merchant skill for OpenClaw integration
 
@@ -21,6 +22,7 @@ Instead of copying Clink product docs into the skill repository, this skill keep
 You can use this skill to:
 
 - design standard integration flows, including registered-product product and price selection, checkout session creation, subscription-aware purchase-path routing, webhook contract review, and optional embedded form integration through JS SDK
+- guide new users through docs-backed first-time setup, including account access, MFA, merchant selection, Secret Key setup, product choice, webhook registration, and first checkout preparation
 - design merchant skill for generic agent integration using `agentic-payment-skills` / `clink-payment-skill`, including `clink-cli` dependency setup, adapter contracts, payment execution, callback, and task resume behavior
 - design merchant skill for OpenClaw integration using `openclaw-payment-skills`, including merchant skill integration and merchant backend webhook support for email verification via `customer.verify`
 - answer questions based on official Clink docs and extract relevant endpoint, field, webhook, and contract details
@@ -35,6 +37,16 @@ For standard integration, the expected scope includes:
 - webhook contract review and merchant webhook handling
 - subscription lifecycle webhook coverage and post-return status reconciliation when needed
 - optional merchant frontend integration through JS SDK embedded form or configured link opening
+
+For new user onboarding, the expected scope includes:
+
+- account invitation, password setup, and MFA guidance from the quickstart docs
+- merchant selection and merchant profile checks under `Settings > Merchant`
+- user and role setup under `Settings > Users`
+- Secret Key retrieval from `Merchant Dashboard > Developers > API Keys` through `Initialize Key`
+- product mode decision before first checkout
+- webhook registration under `Merchant Dashboard > Developers > Webhooks`
+- first sandbox checkout session preparation and next-path routing
 
 For documentation-backed guidance, the expected scope includes:
 
@@ -84,6 +96,7 @@ This skill should not usually try to output final project-specific integration c
 Examples:
 
 - `Design a standard integration for checkout, webhook, and refund`
+- `Create a new user onboarding plan for a merchant starting from zero with Clink quickstart`
 - `Design a registered-product integration with product/price selection, checkout, webhook, and customer portal fallback`
 - `Design a merchant skill for generic agent integration using agentic-payment-skills for my custom agent runtime with clink-cli payment execution, callback, and task resume`
 - `Design a merchant skill for OpenClaw integration using openclaw-payment-skills with merchant skill handoff and customer.verify email verification support`
@@ -98,6 +111,7 @@ Examples:
 |---|---|
 | `SKILL.md` | Main routing and operating rules |
 | `references/retrieval-protocol.md` | Local-doc retrieval protocol |
+| `references/new-user-onboarding.md` | Docs-backed new user onboarding workflow |
 | `references/standard-integration.md` | Standard integration workflow |
 | `references/generic-agent-integration.md` | Merchant skill for generic agent integration workflow |
 | `references/agent-integration.md` | Merchant skill for OpenClaw integration workflow |

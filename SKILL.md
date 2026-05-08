@@ -1,6 +1,6 @@
 ---
 name: clink-integ-skills
-description: Design, scaffold, validate, and review Clink standard integrations, merchant skill for generic agent integrations, merchant skill for OpenClaw integrations, and documentation-backed contracts.
+description: Design, scaffold, validate, and review Clink standard integrations, new user onboarding, merchant skill for generic agent integrations, merchant skill for OpenClaw integrations, and documentation-backed contracts.
 ---
 
 # clink-integ-skills
@@ -16,9 +16,10 @@ This skill is modular:
 
 ## Scope
 
-This skill covers three primary integration paths:
+This skill covers four primary guidance paths:
 
 - standard integration, including checkout session creation, webhook contract review, and optional embedded form integration through JS SDK
+- new user onboarding, including docs-backed first-time dashboard, account, API key, product, webhook, and first checkout setup guidance
 - merchant skill for generic agent integration, including non-OpenClaw agent runtime contracts through `agentic-payment-skills`, adapter design, `clink-cli` payment execution, callback, and task resume behavior
 - merchant skill for OpenClaw integration, including OpenClaw merchant skill integration through `openclaw-payment-skills` and merchant backend webhook support for email verification
 
@@ -28,6 +29,27 @@ It also provides support capabilities for:
 - integration validation, including handoff contract validation, webhook-design validation, and integration guidance artifacts
 
 ## Routing
+
+### New User Onboarding
+
+Use this path when the user wants help with:
+
+- new user onboarding
+- getting started, quickstart, first-time setup, or first checkout
+- initial dashboard setup before integration
+- account invitation, password setup, MFA setup, merchant selection, or user access
+- initial Secret Key, product, webhook, and first checkout preparation
+
+Read:
+
+- `references/retrieval-protocol.md`
+- run `node scripts/load_official_docs.mjs`
+- `references/new-user-onboarding.md`
+
+After drafting the solution, review it with:
+
+- `references/review-checklist.md`
+- `references/output-artifacts.md`
 
 ### Standard Integration
 
@@ -147,6 +169,7 @@ After drafting the answer, review it with:
 - route the request to the correct scenario before designing the flow
 - read only the modules needed for the current task
 - draft the scenario-specific solution first, then generate or review the output artifacts, then use `references/review-checklist.md` as the final self-review pass
+- for new user onboarding, guide only from docs-confirmed account, dashboard, API key, product, webhook, and first checkout facts, then route the user to the appropriate implementation path
 - if the user asks for implementation and no codebase is present, identify or ask for the backend language before writing code
 - if the user asks for implementation guidance, help the coding agent decide what to build before attempting project-specific code
 - for standard integration, clarify product mode before designing checkout creation
@@ -159,6 +182,7 @@ After drafting the answer, review it with:
 ## Hard Rules
 
 - default all generated code and integration guidance to sandbox environment unless the user explicitly requests production
+- keep new user onboarding guidance in sandbox even when the user mentions production; route production readiness or go-live onboarding requests through integration validation and production promotion instead of generating production onboarding directly
 - use only "sandbox" and "production" as user-facing environment terms; do not expose internal naming such as "uat" or "prod" unless the output specifically targets developers who need the internal mapping
 - do not generate production rollout guidance or production base URLs before the production validation gate completes successfully
 - if the current task needs official docs, do not read or cite the cached official docs before running the freshness check command
@@ -167,6 +191,8 @@ After drafting the answer, review it with:
 - running `node scripts/load_payment_skill_contexts.mjs` means: download the latest GitHub codeload zip payment skill context into this skill's `.cache` when possible, never mutate sibling payment skill worktrees, and fall back to local sibling skill files only with an explicit warning
 - do not mix standard integration, merchant skill for generic agent integration, and merchant skill for OpenClaw integration unless the user explicitly wants multiple paths
 - do not treat `merchantReferenceId` as an idempotency key
+- do not invent KYB, KYC, merchant approval, payout, production activation, or account setup steps beyond what the loaded official docs or maintainer-provided environment approval rules confirm
+- for environment approval guidance, state that sandbox registration is automatically approved and succeeds, so users can obtain the sandbox Secret Key directly; production registration requires waiting for approval before production key or go-live guidance, and users can proactively contact support
 - when asking the user to provide or configure a webhook signing key or Secret Key, state the dashboard path and method: webhook signing key comes from `Merchant Dashboard > Developers > Webhooks` after registering/selecting the webhook endpoint; Secret Key comes from `Merchant Dashboard > Developers > API Keys` by clicking `Initialize Key`, then copying and securely storing the key because it is displayed only once
 - prefer environment variables or secret-manager placeholders for webhook signing keys and Secret Keys; do not ask the user to paste real secrets into chat, generated source code, docs, or public repositories
 - do not describe webhook handling without dashboard subscription, endpoint registration, signature verification, idempotency, retry handling, and out-of-order tolerance
@@ -178,6 +204,7 @@ After drafting the answer, review it with:
 ## Module Map
 
 - `references/retrieval-protocol.md`
+- `references/new-user-onboarding.md`
 - `references/standard-integration.md`
 - `references/agent-integration.md`
 - `references/generic-agent-integration.md`
