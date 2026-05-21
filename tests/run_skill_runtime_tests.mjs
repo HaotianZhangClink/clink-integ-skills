@@ -412,6 +412,19 @@ async function main() {
   check(elementsReact.artifacts.some((item) => item.name === "merchant_order_mapping"), "Elements prompt should preserve merchant_order_mapping");
   check(elementsReact.notes.some((item) => item.includes("embedded payment component")), "Elements prompt should add embedded payment component note");
 
+  const elementsFromContext = await runSkillRuntime({
+    prompt: "Help me integrate this checkout component.",
+    contextBlocks: [
+      {
+        title: "Checkout.tsx",
+        content: "import { loadClinkElements } from '@clink-ai/clink-elements';\nconst paymentMethod = clink.createElement('paymentMethod');",
+      },
+    ],
+    docsFallbackSource: docsFallback,
+  });
+  check(elementsFromContext.artifacts.some((item) => item.name === "elements_frontend_checklist"), "Elements signals in contextBlocks should emit elements_frontend_checklist");
+  check(elementsFromContext.notes.some((item) => item.includes("embedded payment component")), "Elements signals in contextBlocks should add embedded payment component note");
+
   const elementsPromo = await runSkillRuntime({
     prompt: "Build embedded checkout with clink-elements amount-change and promoCodeChange for a custom promo code UI.",
     docsFallbackSource: docsFallback,
@@ -430,6 +443,13 @@ async function main() {
   });
   check(elementsNext.artifacts.some((item) => item.name === "elements_server_client_boundary"), "Next.js Elements prompt should emit server/client boundary artifact");
   check(elementsNext.notes.some((item) => item.includes("browser-only")), "Next.js Elements prompt should add browser-only note");
+  check(!elementsNext.questions.some((item) => item.includes("frontend framework")), "Next.js Elements prompt should not ask to confirm frontend framework");
+
+  const elementsExistingSession = await runSkillRuntime({
+    prompt: "Create a Next.js client component for @clink-ai/clink-elements using an existing sessionId.",
+    docsFallbackSource: docsFallback,
+  });
+  check(!elementsExistingSession.questions.some((item) => item.includes("registered product mode")), "frontend-only Elements prompt with existing sessionId should not ask product mode");
 
   const elementsAgentDominates = await runSkillRuntime({
     prompt: "Design a merchant agent payment handoff with customer.verify and mention clink-elements only as the frontend checkout option.",
