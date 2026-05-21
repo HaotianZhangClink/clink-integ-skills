@@ -36,6 +36,31 @@ This file is for final review and self-check. It is not the primary workflow doc
 - does the design clearly separate payment confirmation from merchant fulfillment when downstream delivery exists
 - does refund handling describe lifecycle behavior instead of assuming unsupported create APIs
 
+## Elements Integration Checks
+
+- does Elements guidance treat Elements as an embedded payment component, not a hosted checkout page
+- does it avoid making modal checkout the default layout
+- does it identify inline, modal, drawer, multi-step, or headless host UI as the selected layout when layout matters
+- does it confirm the frontend framework or ask for it before framework-specific code
+- does it confirm backend-created checkout session before `loadClinkElements`
+- does it confirm the checkout session is intended for Elements rather than hosted checkout
+- does it keep order creation and checkout session creation on the server
+- does it keep Secret Key and webhook signing key out of frontend code
+- does it ensure Next.js or similar framework examples are browser-only where SDK DOM access is required
+- does it use frontend-safe `publishKey`, `environment`, and `sessionId` for `loadClinkElements`
+- does it create `paymentMethod` before `currencySelect`
+- does it avoid creating duplicate element types from one SDK instance
+- does it call `destroy()` during component teardown and when `sessionId` changes
+- does it handle async initialization completing after component unmount
+- does it map `submit-enabled` as "can submit", not "disabled"
+- does it handle `submit-visible` so host buttons do not conflict with built-in third-party payment buttons
+- does it treat `amount-change` as the source for displayed amount, product, promotion, and tax UI
+- does it treat `session-success` and `session-pending` as frontend UX signals only
+- does it keep webhook-driven backend state as the authoritative payment confirmation
+- does it handle known SDK errors and give the user a retry or session recreation path
+- does it document whether SDK skeleton or host skeleton is used
+- does it check host containers for stable sizing, scrolling, and mobile button placement
+
 ## New User Onboarding Checks
 
 - does onboarding guidance load official docs before giving exact dashboard paths or setup steps

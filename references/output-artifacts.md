@@ -20,6 +20,20 @@ For non-registered product mode, add:
 
 - inline payload design notes such as `priceDataList`
 
+When Elements is in scope, add:
+
+- `elements_frontend_checklist` for package or CDN choice, publish key, environment, session ID, mount containers, and lifecycle cleanup
+- `elements_event_mapping` for `submit-enabled`, `submit-visible`, `amount-change`, `session-init-success`, `session-success`, `session-pending`, `promo-code-error`, and `error`
+- `elements_error_handling_checklist` for API validation, expired session, completed session, unsupported session UI mode, and load failure
+- `elements_host_ui_todo` for React, Vue, native JS, or the inferred frontend framework
+- `elements_layout_recipe` for inline, modal, drawer, or multi-step checkout layout selection
+- `elements_lifecycle_checklist` for session-to-instance mapping, destroy/re-init, async teardown, and route or modal cleanup
+- `elements_server_client_boundary` for server-created session, frontend-safe config, browser-only SDK code, and webhook authority
+
+When Elements promotion-code UI is in scope, add:
+
+- `promotion_code_ui_contract` for collapsed, expanded, loading or error, applied, and clear states using `promoCodeChange`
+
 ## New User Onboarding Artifacts
 
 A strong new user onboarding output should usually include:

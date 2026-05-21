@@ -22,6 +22,7 @@ const requiredFiles = [
   "references/retrieval-protocol.md",
   "references/new-user-onboarding.md",
   "references/standard-integration.md",
+  "references/elements-integration.md",
   "references/agent-integration.md",
   "references/generic-agent-integration.md",
   "references/output-artifacts.md",
@@ -62,6 +63,10 @@ const moduleExpectations = [
       "node scripts/load_official_docs.mjs",
       "node scripts/load_payment_skill_contexts.mjs",
       "references/new-user-onboarding.md",
+      "references/elements-integration.md",
+      "@clink-ai/clink-elements",
+      "loadClinkElements",
+      "amount-change",
       "--dependency openclaw-payment-skills",
       "--dependency agentic-payment-skills",
       "guidance artifacts",
@@ -150,7 +155,36 @@ const moduleExpectations = [
       "X-Clink-Signature",
       "raw event body",
       "X-Clink-Timestamp + \".\" + raw event body",
-      "refund lifecycle"
+      "refund lifecycle",
+      "Elements",
+      "references/elements-integration.md",
+      "loadClinkElements",
+      "paymentMethod",
+      "currencySelect"
+    ]
+  },
+  {
+    file: "references/elements-integration.md",
+    contains: [
+      "embedded payment component",
+      "not a hosted checkout page",
+      "Integration Shape Selection",
+      "Inline region",
+      "Modal/Dialog",
+      "Drawer/Side panel",
+      "Multi-step checkout",
+      "Headless host UI",
+      "useClinkElementsPayment",
+      "submitEnabled",
+      "submit-visible",
+      "amount-change",
+      "promoCodeChange",
+      "section.hideSkeleton",
+      "paymentMethod",
+      "currencySelect",
+      "destroy()",
+      "server verifies webhooks",
+      "browser-only"
     ]
   },
   {
@@ -224,7 +258,13 @@ const moduleExpectations = [
       "--dependency openclaw-payment-skills",
       "--dependency agentic-payment-skills",
       "Merchant Dashboard > Developers > Webhooks",
-      "Merchant Dashboard > Developers > API Keys"
+      "Merchant Dashboard > Developers > API Keys",
+      "Elements",
+      "loadClinkElements",
+      "submit-enabled",
+      "submit-visible",
+      "amount-change",
+      "destroy()"
     ]
   },
   {
@@ -248,7 +288,9 @@ const moduleExpectations = [
       "contract validation report",
       "launch-readiness checklist",
       "production promotion plan",
-      "base URL"
+      "base URL",
+      "elements_frontend_checklist",
+      "promotion_code_ui_contract"
     ]
   },
   {

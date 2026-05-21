@@ -18,7 +18,7 @@ This skill is modular:
 
 This skill covers four primary guidance paths:
 
-- standard integration, including checkout session creation, webhook contract review, and optional embedded form integration through JS SDK
+- standard integration, including checkout session creation, webhook contract review, and optional embedded form integration through JS SDK and `@clink-ai/clink-elements`
 - new user onboarding, including docs-backed first-time dashboard, account, API key, product, webhook, and first checkout setup guidance
 - merchant skill for generic agent integration, including non-OpenClaw agent runtime contracts through `agentic-payment-skills`, adapter design, `clink-cli` payment execution, callback, and task resume behavior
 - merchant skill for OpenClaw integration, including OpenClaw merchant skill integration through `openclaw-payment-skills` and merchant backend webhook support for email verification
@@ -60,6 +60,8 @@ Use this path when the user wants help with:
 - merchant backend implementation
 - webhook registration and verification
 - optional embedded form integration through JS SDK
+- `@clink-ai/clink-elements`, `loadClinkElements`, `createElement`, `paymentMethod`, `currencySelect`, `submit-enabled`, `submit-visible`, `amount-change`, `session-success`, `session-pending`, or `promoCodeChange`
+- embedded checkout or iframe payment component integration
 - configured link opening flow
 - order and refund synchronization
 - refund lifecycle design
@@ -68,6 +70,7 @@ Read:
 
 - `references/retrieval-protocol.md`
 - `references/standard-integration.md`
+- `references/elements-integration.md` when the request mentions Elements, embedded checkout, SDK iframe components, `loadClinkElements`, `paymentMethod`, `currencySelect`, or Elements events
 
 After drafting the solution, review it with:
 
@@ -173,6 +176,9 @@ After drafting the answer, review it with:
 - if the user asks for implementation and no codebase is present, identify or ask for the backend language before writing code
 - if the user asks for implementation guidance, help the coding agent decide what to build before attempting project-specific code
 - for standard integration, clarify product mode before designing checkout creation
+- for Elements integration, treat Elements as a Standard Integration frontend path, not a hosted checkout page or separate top-level integration route
+- for Elements implementation, keep order creation and checkout session creation on the server, use only frontend-safe `publishKey`, `environment`, and `sessionId` in browser code, and keep webhook reconciliation authoritative
+- for Elements frontend-only implementation, identify or ask for the frontend framework before writing framework-specific code
 - for merchant skill for OpenClaw integration, separate merchant skill, merchant server, and `openclaw-payment-skills` responsibilities
 - for merchant skill for generic agent integration, separate merchant skill or tool, agent runtime, adapter, merchant server, `agentic-payment-skills`, callback, and resume responsibilities
 - when the user asks for developer help, prefer producing executable artifacts such as checklists, sample payloads, contract skeletons, and validation reports
@@ -198,6 +204,10 @@ After drafting the answer, review it with:
 - do not describe webhook handling without dashboard subscription, endpoint registration, signature verification, idempotency, retry handling, and out-of-order tolerance
 - do not assume a public refund-create API unless local docs explicitly show one
 - do not describe merchant skill integration as a plain checkout redirect flow
+- do not describe Elements as hosted checkout, and do not make modal checkout the default Elements layout
+- do not put Secret Key, webhook signing key, server SDK calls, merchant order creation, or checkout session creation into browser-side Elements guidance
+- do not treat `session-success`, `session-pending`, `successUrl`, or iframe callback behavior as authoritative payment confirmation
+- do not invert `submit-enabled`; it means the host can submit
 - do not output final project-specific integration code unless the surrounding codebase and stack are known well enough
 - do not answer a developer integration request with prose only when guidance artifacts or validation reports would materially help
 
@@ -206,6 +216,7 @@ After drafting the answer, review it with:
 - `references/retrieval-protocol.md`
 - `references/new-user-onboarding.md`
 - `references/standard-integration.md`
+- `references/elements-integration.md`
 - `references/agent-integration.md`
 - `references/generic-agent-integration.md`
 - `references/output-artifacts.md`

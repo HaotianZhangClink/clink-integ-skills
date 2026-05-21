@@ -396,6 +396,47 @@ async function main() {
   check(sandboxSwitch.environment?.targetEnvironment === "sandbox", "explicit sandbox signal should resolve to sandbox");
   check(sandboxSwitch.productionValidation === null, "sandbox signal should not trigger production validation");
 
+  const elementsReact = await runSkillRuntime({
+    prompt: "Help me integrate @clink-ai/clink-elements in a React checkout with loadClinkElements and paymentMethod.",
+    docsFallbackSource: docsFallback,
+  });
+  check(elementsReact.route === "merchant_standard_integration", "clink-elements prompt should route to merchant_standard_integration");
+  check(elementsReact.artifacts.some((item) => item.name === "elements_frontend_checklist"), "Elements prompt should emit elements_frontend_checklist");
+  check(elementsReact.artifacts.some((item) => item.name === "elements_event_mapping"), "Elements prompt should emit elements_event_mapping");
+  check(elementsReact.artifacts.some((item) => item.name === "elements_error_handling_checklist"), "Elements prompt should emit elements_error_handling_checklist");
+  check(elementsReact.artifacts.some((item) => item.name === "elements_host_ui_todo"), "Elements prompt should emit elements_host_ui_todo");
+  check(elementsReact.artifacts.some((item) => item.name === "elements_lifecycle_checklist"), "Elements prompt should emit elements_lifecycle_checklist");
+  check(elementsReact.artifacts.some((item) => item.name === "elements_server_client_boundary"), "Elements prompt should emit elements_server_client_boundary");
+  check(elementsReact.artifacts.some((item) => item.name === "integration_checklist"), "Elements prompt should preserve standard integration_checklist");
+  check(elementsReact.artifacts.some((item) => item.name === "webhook_handler_checklist"), "Elements prompt should preserve webhook_handler_checklist");
+  check(elementsReact.artifacts.some((item) => item.name === "merchant_order_mapping"), "Elements prompt should preserve merchant_order_mapping");
+  check(elementsReact.notes.some((item) => item.includes("embedded payment component")), "Elements prompt should add embedded payment component note");
+
+  const elementsPromo = await runSkillRuntime({
+    prompt: "Build embedded checkout with clink-elements amount-change and promoCodeChange for a custom promo code UI.",
+    docsFallbackSource: docsFallback,
+  });
+  check(elementsPromo.artifacts.some((item) => item.name === "promotion_code_ui_contract"), "promoCodeChange prompt should emit promotion_code_ui_contract");
+
+  const elementsDrawer = await runSkillRuntime({
+    prompt: "Use loadClinkElements in a drawer checkout side panel with currencySelect and paymentMethod.",
+    docsFallbackSource: docsFallback,
+  });
+  check(elementsDrawer.artifacts.some((item) => item.name === "elements_layout_recipe"), "inline or drawer Elements prompt should emit elements_layout_recipe");
+
+  const elementsNext = await runSkillRuntime({
+    prompt: "Create a Next.js client component for @clink-ai/clink-elements without putting the secret key in the browser.",
+    docsFallbackSource: docsFallback,
+  });
+  check(elementsNext.artifacts.some((item) => item.name === "elements_server_client_boundary"), "Next.js Elements prompt should emit server/client boundary artifact");
+  check(elementsNext.notes.some((item) => item.includes("browser-only")), "Next.js Elements prompt should add browser-only note");
+
+  const elementsAgentDominates = await runSkillRuntime({
+    prompt: "Design a merchant agent payment handoff with customer.verify and mention clink-elements only as the frontend checkout option.",
+    docsFallbackSource: docsFallback,
+  });
+  check(elementsAgentDominates.route === "merchant_agent_integration", "Elements mention should not override dominant merchant agent signals");
+
   // CLI: skip validation requires explicit confirmation
   const cliSkipArgs = [
     runtimeScript,

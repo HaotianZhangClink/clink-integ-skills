@@ -99,8 +99,13 @@ After the merchant backend creates the checkout session, the merchant frontend s
 Optional standard-integration frontend paths:
 
 - use the JS SDK to render an embedded form
+- use Elements through `@clink-ai/clink-elements`, `loadClinkElements`, `paymentMethod`, and optional `currencySelect`
 - open the configured checkout link returned by the backend
 - open the configured checkout link inside a merchant-controlled dialog or iframe callback flow when the product UX requires in-page payment
+
+For Elements requests, also read `references/elements-integration.md`. Elements is an embedded payment component, not a hosted checkout page. The merchant controls the host layout and UI state, while the SDK controls secure payment inputs, wallet buttons, 3DS, QRCode, and payment iframe behavior.
+
+Elements layout should be selected for the merchant product flow instead of defaulting to a modal. Valid shapes include inline checkout, modal or dialog checkout, drawer or side-panel checkout, multi-step checkout, and headless host UI. `paymentMethod` and `currencySelect` may mount into different visual regions, but `paymentMethod` must be created first.
 
 Do not describe the frontend as independent from the merchant backend. The backend still owns order creation, checkout session creation, and reconciliation context.
 
@@ -225,6 +230,7 @@ A good standard integration output should usually include:
 - checkout field mapping
 - merchant backend responsibility for checkout session creation
 - merchant frontend path through JS SDK embedded form or configured link opening
+- Elements frontend path through `references/elements-integration.md` when `loadClinkElements`, `paymentMethod`, `currencySelect`, embedded checkout, or SDK events are in scope
 - webhook setup and verification steps
 - order and subscription reconciliation after return
 - separation between payment confirmation and merchant fulfillment when the merchant has downstream delivery work
