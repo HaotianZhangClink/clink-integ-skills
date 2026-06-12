@@ -22,8 +22,8 @@ For non-registered product mode, add:
 
 When Elements is in scope, add:
 
-- `elements_frontend_checklist` for package or CDN choice, publish key, environment, session ID, mount containers, and lifecycle cleanup
-- `elements_event_mapping` for `submit-enabled`, `submit-visible`, `amount-change`, `session-init-success`, `session-success`, `session-pending`, `promo-code-error`, and `error`
+- `elements_frontend_checklist` for package or CDN choice, server-created Elements session with `uiMode: "elements"` and `{ELEMENTS_SESSION_ID}` redirect placeholder, publish key, environment, session ID, mount containers, and lifecycle cleanup
+- `elements_event_mapping` for `submit-enabled` as can-submit (`true` enables host submission), `submit-visible`, `amount-change`, `session-init-success`, `session-success`, `session-pending`, `promo-code-error`, and `error`
 - `elements_error_handling_checklist` for API validation, expired session, completed session, unsupported session UI mode, and load failure
 - `elements_host_ui_todo` for React, Vue, native JS, or the inferred frontend framework
 - `elements_layout_recipe` for inline, modal, drawer, or multi-step checkout layout selection

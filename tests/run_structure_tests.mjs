@@ -337,6 +337,30 @@ for (const expectation of moduleExpectations) {
   }
 }
 
+if (exists("references/elements-integration.md")) {
+  const elementsGuide = read("references/elements-integration.md");
+  check(
+    elementsGuide.includes("`submit-enabled` payload is `true` when the host can submit"),
+    "references/elements-integration.md must state the positive submit-enabled payload semantics"
+  );
+  check(
+    elementsGuide.includes("Do not set `disabled = enabled`"),
+    "references/elements-integration.md must explicitly reject the old inverted disabled mapping"
+  );
+  check(
+    elementsGuide.includes("`disabled = !enabled`"),
+    "references/elements-integration.md must document disabled UI as disabled = !enabled"
+  );
+  check(
+    elementsGuide.includes("`uiMode: \"elements\"`"),
+    "references/elements-integration.md must document Elements checkout session uiMode"
+  );
+  check(
+    elementsGuide.includes("`{ELEMENTS_SESSION_ID}`"),
+    "references/elements-integration.md must document the Elements redirectUrl session placeholder"
+  );
+}
+
 if (failures.length > 0) {
   console.error(`FAIL: ${failures.length} structure checks failed`);
   for (const failure of failures) console.error(`- ${failure}`);

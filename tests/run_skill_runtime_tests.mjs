@@ -400,8 +400,13 @@ async function main() {
     prompt: "Help me integrate @clink-ai/clink-elements in a React checkout with loadClinkElements and paymentMethod.",
     docsFallbackSource: docsFallback,
   });
+  const getArtifactSummary = (artifacts, name) => artifacts.find((item) => item.name === name)?.summary || "";
   check(elementsReact.route === "merchant_standard_integration", "clink-elements prompt should route to merchant_standard_integration");
   check(elementsReact.artifacts.some((item) => item.name === "elements_frontend_checklist"), "Elements prompt should emit elements_frontend_checklist");
+  check(
+    getArtifactSummary(elementsReact.artifacts, "elements_frontend_checklist").includes("{ELEMENTS_SESSION_ID}"),
+    "elements_frontend_checklist should mention the exact {ELEMENTS_SESSION_ID} redirect placeholder"
+  );
   check(elementsReact.artifacts.some((item) => item.name === "elements_event_mapping"), "Elements prompt should emit elements_event_mapping");
   check(elementsReact.artifacts.some((item) => item.name === "elements_error_handling_checklist"), "Elements prompt should emit elements_error_handling_checklist");
   check(elementsReact.artifacts.some((item) => item.name === "elements_host_ui_todo"), "Elements prompt should emit elements_host_ui_todo");

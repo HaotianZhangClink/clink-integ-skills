@@ -41,6 +41,17 @@ The core flow is:
 5. Merchant client handles SDK events for UX.
 6. Merchant server verifies webhooks and performs authoritative order, subscription, refund, and fulfillment synchronization.
 
+When creating an Elements checkout session, include the Elements UI mode and redirect placeholder in the server-side checkout session payload:
+
+```js
+{
+  uiMode: "elements",
+  redirectUrl: "https://merchant.example/checkout/{ELEMENTS_SESSION_ID}"
+}
+```
+
+Set `uiMode: "elements"`. `{ELEMENTS_SESSION_ID}` is the placeholder for the session ID that will be filled for the created Elements session. Keep this request server-side because it belongs to checkout session creation.
+
 Hard boundaries:
 
 - never put Secret Key, server SDK calls, checkout session creation, or merchant order creation logic in browser code
@@ -143,17 +154,19 @@ The hook or Vue composable should own:
 
 Layout recipes should consume the state for inline, modal, drawer, and multi-step checkout layouts.
 
-Do not model `submit-enabled` as `buttonDisabled`. The event means "can submit". Use `submitEnabled`, and compute button disabled state as:
+`submit-enabled` payload is `true` when the host can submit and `false` when the host must block submission. Prefer `submitEnabled`, and compute button disabled state as:
 
 ```ts
 const disabled = !submitEnabled || submitting || initializing;
 ```
 
+`buttonDisabled` is acceptable only when assigned from the inverse event value, for example `disabled = !enabled`. Do not set `disabled = enabled`, pass the event payload directly into a disabled prop, or name the event argument `disabled`.
+
 ## Event To Host UI Mapping
 
 | Event | Host UI Action |
 |---|---|
-| `submit-enabled` | Enable or disable payment button, promotion-code input, apply button, and remove button |
+| `submit-enabled` | Treat `true` as can-submit; derive disabled UI as `disabled = !enabled` plus local loading or initialization state for the payment button, promotion-code input, apply button, and remove button |
 | `submit-visible` | Show or hide the host payment button when wallet or third-party buttons own submission |
 | `amount-change` | Update total, currency, product display, discount, tax, and payment button text |
 | `session-init-success` | Clear host-managed skeleton or initialization state |
@@ -169,7 +182,7 @@ Host UI must still reconcile order state through backend confirmation. Do not tr
 When the merchant builds its own promotion-code UI:
 
 - show the entry only when `amount-change` reports `enablePromotionCode`
-- disable input, apply, and remove actions when `submit-enabled` is false
+- disable input, apply, and remove actions when `submit-enabled` is `false`; never pass the event payload directly to a `disabled` prop
 - apply through `promoCodeChange({ type: 'apply', code })`
 - clear through `promoCodeChange({ type: 'clear' })`
 - set loading after apply or clear and clear loading on `amount-change` or `promo-code-error`
@@ -223,7 +236,7 @@ An Elements answer or code review should verify:
 - `paymentMethod` is created before `currencySelect`
 - one SDK instance does not create duplicate element types
 - `destroy()` runs during teardown and session replacement
-- `submit-enabled` is interpreted as "can submit"
+- `submit-enabled` is interpreted as "can submit"; `true` enables host submission and `false` blocks it
 - `submit-visible` is handled to avoid duplicate host and wallet buttons
 - `amount-change` drives displayed amount, product, promotion, and tax UI
 - `session-success` and `session-pending` stay UX signals only

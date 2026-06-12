@@ -207,7 +207,7 @@ After drafting the answer, review it with:
 - do not describe Elements as hosted checkout, and do not make modal checkout the default Elements layout
 - do not put Secret Key, webhook signing key, server SDK calls, merchant order creation, or checkout session creation into browser-side Elements guidance
 - do not treat `session-success`, `session-pending`, `successUrl`, or iframe callback behavior as authoritative payment confirmation
-- do not invert `submit-enabled`; it means the host can submit
+- do not invert `submit-enabled`; `true` means the host can submit, so disabled UI must be derived as `!enabled` plus local loading or initialization state
 - do not output final project-specific integration code unless the surrounding codebase and stack are known well enough
 - do not answer a developer integration request with prose only when guidance artifacts or validation reports would materially help
 

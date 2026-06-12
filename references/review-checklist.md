@@ -43,7 +43,7 @@ This file is for final review and self-check. It is not the primary workflow doc
 - does it identify inline, modal, drawer, multi-step, or headless host UI as the selected layout when layout matters
 - does it confirm the frontend framework or ask for it before framework-specific code
 - does it confirm backend-created checkout session before `loadClinkElements`
-- does it confirm the checkout session is intended for Elements rather than hosted checkout
+- does it confirm the checkout session is intended for Elements rather than hosted checkout, including `uiMode: "elements"` and a `redirectUrl` containing `{ELEMENTS_SESSION_ID}`
 - does it keep order creation and checkout session creation on the server
 - does it keep Secret Key and webhook signing key out of frontend code
 - does it ensure Next.js or similar framework examples are browser-only where SDK DOM access is required
@@ -52,7 +52,7 @@ This file is for final review and self-check. It is not the primary workflow doc
 - does it avoid creating duplicate element types from one SDK instance
 - does it call `destroy()` during component teardown and when `sessionId` changes
 - does it handle async initialization completing after component unmount
-- does it map `submit-enabled` as "can submit", not "disabled"
+- does it map `submit-enabled` as "can submit", not "disabled", using `disabled = !enabled` for disabled UI
 - does it handle `submit-visible` so host buttons do not conflict with built-in third-party payment buttons
 - does it treat `amount-change` as the source for displayed amount, product, promotion, and tax UI
 - does it treat `session-success` and `session-pending` as frontend UX signals only
