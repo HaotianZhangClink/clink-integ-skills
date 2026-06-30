@@ -1,0 +1,4 @@
+vendor/clink-integ-cli/clink-integ-cli -text
+vendor/clink-integ-cli/SHA256SUMS text eol=lf
+vendor/clink-integ-cli/VERSION text eol=lf
+vendor/clink-integ-cli/manifest.json text eol=lf
