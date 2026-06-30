@@ -1,6 +1,6 @@
-﻿---
+---
 name: clink-integ-skills
-description: Design, scaffold, validate, and review ClinkBill/Clink payment integrations, including clink-integ-cli usage, local clink login Secret Key bootstrap, browserless manual Secret Key setup, webhook endpoint automation, product/price/subscription catalog import, checkout and subscription APIs, webhook signature verification, UAT validation, new user onboarding, merchant skill integrations, and documentation-backed contracts.
+description: Design, scaffold, validate, and review ClinkBill/Clink payment integrations, including clink-integ-cli usage, local clink login Secret Key bootstrap, browserless manual Secret Key setup, webhook endpoint automation, product/price/subscription catalog import, checkout and subscription APIs, webhook signature verification, sandbox validation, new user onboarding, merchant skill integrations, and documentation-backed contracts.
 ---
 
 # clink-integ-skills

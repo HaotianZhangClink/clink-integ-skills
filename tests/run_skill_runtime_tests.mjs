@@ -85,11 +85,32 @@ async function main() {
   check(docsOnlyNoCode.docsGateInvoked === true, "docs-only no-code prompt should invoke docs gate");
   check(docsOnlyNoCode.artifacts.some((item) => item.name === "doc_fact_table"), "docs-only no-code prompt should emit doc_fact_table");
 
+  const noCodeContextStandard = await runSkillRuntime({
+    prompt: "Help me implement Clink checkout. There is no code context yet.",
+    docsFallbackSource: docsFallback,
+  });
+  check(noCodeContextStandard.route === "merchant_standard_integration", "implementation with no code context should stay on standard integration route");
+  check(noCodeContextStandard.questions.some((item) => item.includes("backend language")), "implementation with no code context should ask for backend language");
+  check(noCodeContextStandard.artifacts.some((item) => item.name === "integration_checklist"), "implementation with no code context should emit integration artifacts");
+
+  const noCodePlatformStandard = await runSkillRuntime({
+    prompt: "Help me integrate Clink in a no-code platform with a backend webhook.",
+    docsFallbackSource: docsFallback,
+  });
+  check(noCodePlatformStandard.route === "merchant_standard_integration", "no-code platform integration should stay on standard integration route");
+  check(noCodePlatformStandard.artifacts.some((item) => item.name === "webhook_endpoint_automation"), "no-code platform integration should emit webhook automation artifact");
+
   const nonClinkStripe = await runSkillRuntime({
     prompt: "Help me integrate Stripe Checkout and handle Stripe webhook signature verification.",
     docsFallbackSource: docsFallback,
   });
   check(nonClinkStripe.route === "none", "Stripe-only prompt should not trigger a Clink integration route");
+
+  const nonClinkCheckoutCom = await runSkillRuntime({
+    prompt: "Help me integrate Checkout.com payments and handle Checkout.com webhook signature verification.",
+    docsFallbackSource: docsFallback,
+  });
+  check(nonClinkCheckoutCom.route === "none", "Checkout.com-only prompt should not trigger a Clink integration route");
 
   const agent = await runSkillRuntime({
     prompt: "Design a merchant agent integration using Clink payment skill and customer.verify.",
@@ -261,7 +282,7 @@ async function main() {
   check(standard.productionValidation === null, "sandbox prompt should not trigger production validation");
   check(
     standard.notes.some((item) => item.includes("4242424242424242") && item.includes("3-digit CVC") && item.includes("future expiry")),
-    "sandbox standard integration should remind users about the UAT card-binding test card"
+    "sandbox standard integration should remind users about the sandbox card-binding test card"
   );
 
   const defaultState = createRuntimeState({
@@ -508,12 +529,12 @@ async function main() {
   check(sandboxSwitch.productionValidation === null, "sandbox signal should not trigger production validation");
 
   const uatPaymentValidation = await runSkillRuntime({
-    prompt: "After integration, help me do sandbox UAT payment validation.",
+    prompt: "After integration, help me do sandbox payment validation.",
     docsFallbackSource: docsFallback,
   });
-  check(uatPaymentValidation.route === "merchant_standard_integration", "sandbox UAT payment validation should stay on standard integration route");
-  check(uatPaymentValidation.notes.some((item) => item.includes("4242424242424242")), "sandbox UAT payment validation should include card-binding test card note");
-  check(uatPaymentValidation.notes.some((item) => item.includes("real UAT payment")), "sandbox UAT payment validation should preserve real-payment truthfulness note");
+  check(uatPaymentValidation.route === "merchant_standard_integration", "sandbox payment validation should stay on standard integration route");
+  check(uatPaymentValidation.notes.some((item) => item.includes("4242424242424242")), "sandbox payment validation should include card-binding test card note");
+  check(uatPaymentValidation.notes.some((item) => item.includes("real sandbox test payment")), "sandbox payment validation should preserve real-payment truthfulness note");
 
   const elementsReact = await runSkillRuntime({
     prompt: "Help me integrate @clink-ai/clink-elements in a React checkout with loadClinkElements and paymentMethod.",

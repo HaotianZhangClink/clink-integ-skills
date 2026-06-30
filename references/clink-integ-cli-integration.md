@@ -1,4 +1,4 @@
-﻿# Clink Integ CLI Integration
+# Clink Integ CLI Integration
 
 ## Purpose
 
@@ -11,7 +11,7 @@ Use it when the task mentions:
 - local desktop `clink login` bootstrap
 - webhook endpoint automation
 - product, price, catalog, or subscription import
-- checkout, subscription, webhook, smoke test, or UAT validation
+- checkout, subscription, webhook, smoke test, or sandbox validation
 - browserless or sandbox environments where `clink login` cannot run
 
 ## Source Repositories
@@ -385,12 +385,12 @@ clink webhook simulate order.succeeded \
 clink smoke-test --webhook-url <public-webhook-url>/api/clink/webhook --json
 ```
 
-5. Real UAT checkout session creation.
-6. Real UAT payment only after someone opens the returned `checkoutUrl` and completes payment.
+5. Real sandbox checkout session creation.
+6. Real sandbox test payment only after someone opens the returned `checkoutUrl` and completes payment.
 
-After the sandbox/UAT integration is ready for card-binding payment testing, remind the user that the card number `4242424242424242` can be used with any 3-digit CVC and any future expiry date. This is test-payment guidance only; never present it as production card guidance.
+After the sandbox integration is ready for card-binding payment testing, remind the user that the card number `4242424242424242` can be used with any 3-digit CVC and any future expiry date. This is test-payment guidance only; never present it as production card guidance.
 
-Never claim a real payment webhook was completed unless a real UAT payment was completed.
+Never claim a real payment webhook was completed unless a real sandbox test payment was completed.
 Webhook 200 is not sufficient for real-payment completion. The final real-payment checklist must confirm the local order matched by both `merchantReferenceId` and `sessionId` is paid/completed, and the merchant entitlement, credits, shipment, download access, or other fulfillment is complete.
 
 ## Delivery Checklist
@@ -399,8 +399,8 @@ Final delivery should distinguish:
 
 - local mock tests
 - signed simulated webhook tests
-- real UAT checkout session creation
-- real UAT payment webhook completion
+- real sandbox checkout session creation
+- real sandbox test payment webhook completion
 
 Provide:
 
@@ -413,7 +413,7 @@ Provide:
 - CLI verification summary
 - webhook endpoint URL
 - tunnel URL if one is still running
-- sandbox/UAT card-binding test reminder when the user needs to complete a test payment: `4242424242424242`, any 3-digit CVC, and any future expiry date
-- remaining human steps; normally this should be limited to local Dashboard login completion or cloud Secret Key provisioning, plus opening `checkoutUrl` for a real UAT payment when needed
+- sandbox card-binding test reminder when the user needs to complete a test payment: `4242424242424242`, any 3-digit CVC, and any future expiry date
+- remaining human steps; normally this should be limited to local Dashboard login completion or cloud Secret Key provisioning, plus opening `checkoutUrl` for a real sandbox test payment when needed
 
 Do not include real Secret Keys, webhook signing keys, Dashboard tokens, checkout credentials, or payment method data in the final answer.

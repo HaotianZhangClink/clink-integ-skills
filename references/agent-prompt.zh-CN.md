@@ -1,10 +1,10 @@
-﻿# ClinkBill AI 自动接入提示词 v2
+# ClinkBill AI 自动接入提示词 v2
 
 帮我把 ClinkBill 支付接入到当前项目。
 
-目标：尽量全自动完成 UAT 支付接入。优先使用 CLI 自动化；如果运行环境没有可用浏览器或无法完成 Dashboard 登录，允许让我在 ClinkBill Dashboard 自己登录后，把 Secret Key 提供给 agent，由 agent 写入安全的服务端环境变量或平台 Secret。除此之外，不要让我手动复制 productId、priceId、webhook signing key，或手动配置 Dashboard webhook，除非当前 CLI/平台能力确实无法自动完成，并且你已明确说明原因。
+目标：尽量全自动完成 sandbox 测试支付接入。优先使用 CLI 自动化；如果运行环境没有可用浏览器或无法完成 Dashboard 登录，允许让我在 ClinkBill Dashboard 自己登录后，把 Secret Key 提供给 agent，由 agent 写入安全的服务端环境变量或平台 Secret。除此之外，不要让我手动复制 productId、priceId、webhook signing key，或手动配置 Dashboard webhook，除非当前 CLI/平台能力确实无法自动完成，并且你已明确说明原因。
 
-请保持真实、可验证：如果没有人打开 `checkoutUrl` 并完成 UAT 测试支付，不要把“真实 checkout session 创建成功 + 签名模拟 webhook 通过”说成“真实付款全链路完成”。
+请保持真实、可验证：如果没有人打开 `checkoutUrl` 并完成 sandbox 测试支付，不要把“真实 checkout session 创建成功 + 签名模拟 webhook 通过”说成“真实付款全链路完成”。
 
 ## 资料
 
@@ -90,7 +90,7 @@ clink login
 如果 CLI 打开了 Dashboard 登录页，请暂停并提示我：
 
 ```text
-请在打开的浏览器里完成 ClinkBill UAT Dashboard 登录。登录完成后告诉我继续。
+请在打开的浏览器里完成 ClinkBill sandbox Dashboard 登录。登录完成后告诉我继续。
 ```
 
 我确认后继续：
@@ -105,7 +105,7 @@ clink auth status --json
 
 如果 `clink login` 无法打开浏览器、无法捕获登录态，或当前是在低代码/云 IDE/sandbox 中运行，请不要卡死在登录流程。改用手动 Secret Key 兜底：
 
-1. 明确提示我去 ClinkBill UAT Dashboard 登录并复制 Secret Key。
+1. 明确提示我去 ClinkBill sandbox Dashboard 登录并复制 Secret Key。
 2. 我把 Secret Key 发给你后，你把它只写入安全的服务端环境变量、平台 Secret 或本地 `.env`。
 3. 只向我索取 `CLINK_SECRET_KEY`。不要在这一步向我索取 `CLINK_WEBHOOK_SIGNING_KEY`，也不要让我手动复制 webhook signing key。
 4. 使用当前 `clink` CLI 支持的 Secret Key 配置方式保存本地 profile；如果命令参数不确定，先运行：
@@ -150,7 +150,7 @@ clink doctor --json
 3. 用搜索定位已有支付、订单、checkout、webhook、subscription、email、download、fulfillment 等相关代码。
 4. 输出一小段“架构侦察结果”，说明你准备把 Clink 接入到哪些文件/模块，依据是什么。
 
-如果没有发现可信的服务端运行时，不要把 `CLINK_SECRET_KEY` 或 webhook signing key 放进前端代码，不要从浏览器直接请求 Clink UAT API，不要声称已经完成支付接入。
+如果没有发现可信的服务端运行时，不要把 `CLINK_SECRET_KEY` 或 webhook signing key 放进前端代码，不要从浏览器直接请求 Clink sandbox API，不要声称已经完成支付接入。
 
 ## Product catalog
 
@@ -228,12 +228,12 @@ clink webhook endpoint ensure \
 2. `clink doctor --json`。
 3. `clink webhook simulate order.succeeded --secret env:CLINK_WEBHOOK_SIGNING_KEY --forward-to <webhook-url> --json`。
 4. `clink smoke-test --webhook-url <public-webhook-url>/api/clink/webhook --json`。
-5. 创建真实 UAT checkout session。
-6. 如需确认真实付款 webhook，打开 `checkoutUrl` 并完成 UAT 测试支付。
+5. 创建真实 sandbox checkout session。
+6. 如需确认真实付款 webhook，打开 `checkoutUrl` 并完成 sandbox 测试支付。
 
 webhook handler 必须使用 `merchantReferenceId` + `sessionId` 双重匹配本地订单；如果两个字段指向不同本地订单，必须拒绝、隔离或升级处理，不能只依赖其中一个字段。
 
-如果没有完成真实 UAT 支付，只能报告真实 UAT checkout session 创建成功、签名模拟 webhook 通过、本地订单处理逻辑通过模拟事件验证。不能报告“真实付款 webhook 已完成”。即使真实 webhook 返回 200，也必须确认本地订单 paid/completed，并确认额度、权益、发货、下载权限或其他 fulfillment 已完成。
+如果没有完成真实 sandbox 测试支付，只能报告真实 sandbox checkout session 创建成功、签名模拟 webhook 通过、本地订单处理逻辑通过模拟事件验证。不能报告“真实付款 webhook 已完成”。即使真实 webhook 返回 200，也必须确认本地订单 paid/completed，并确认额度、权益、发货、下载权限或其他 fulfillment 已完成。
 
 ## 最终交付
 
@@ -248,5 +248,5 @@ webhook handler 必须使用 `merchantReferenceId` + `sessionId` 双重匹配本
 7. CLI 验证结果摘要
 8. webhook endpoint URL
 9. tunnel URL 和本地 URL（如果仍在运行）
-10. 测试结果，明确区分本地 mock、签名模拟 webhook、真实 UAT checkout session、真实 UAT 付款 webhook
+10. 测试结果，明确区分本地 mock、签名模拟 webhook、真实 sandbox checkout session、真实 sandbox 测试付款 webhook
 11. 剩余人工步骤

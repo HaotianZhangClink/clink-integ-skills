@@ -1,8 +1,8 @@
-﻿# clink-integ-skills
+# clink-integ-skills
 
 English | [简体中文](README-zh.md)
 
-`clink-integ-skills` is a Codex-compatible skill for helping coding agents integrate ClinkBill payments. The current version is CLI-first: it guides agents to use `clink-integ-cli`, Secret Key authentication, product catalog import, checkout or subscription APIs, webhook endpoint automation, webhook signature verification, and UAT validation.
+`clink-integ-skills` is a Codex-compatible skill for helping coding agents integrate ClinkBill payments. The current version is CLI-first: it guides agents to use `clink-integ-cli`, Secret Key authentication, product catalog import, checkout or subscription APIs, webhook endpoint automation, webhook signature verification, and sandbox validation.
 
 Use the parent `agent-prompts` repository as the distribution package. This folder is the installable skill, and the parent repository also contains short prompts to give to agents. The agent-facing default prompt is in `agents/openai.yaml`, and longer Chinese prompt references are in `references/agent-prompt.zh-CN.md` and `references/universal-agent-prompt.zh-CN.md`.
 
@@ -79,7 +79,7 @@ The agent discovers product data from the merchant project. The CLI validates, p
 Use this concise prompt when handing a project to an agent:
 
 ```text
-Use $clink-integ-skills to integrate ClinkBill payments into this project with clink-integ-cli, Secret Key setup, product catalog import, checkout/subscription APIs, webhook endpoint automation, and UAT validation.
+Use $clink-integ-skills to integrate ClinkBill payments into this project with clink-integ-cli, Secret Key setup, product catalog import, checkout/subscription APIs, webhook endpoint automation, and sandbox validation.
 ```
 
 The skill itself tells the agent which references to read for standard integration, onboarding, validation, Elements, generic agent payment skills, and OpenClaw payment skills.
@@ -108,7 +108,7 @@ No runtime dependency install is required for the skill itself.
 |---|---|
 | `SKILL.md` | Main routing rules and hard constraints |
 | `agents/openai.yaml` | Agent UI metadata and default prompt |
-| `references/clink-integ-cli-integration.md` | CLI-first Secret Key, catalog, checkout, webhook, and UAT workflow |
+| `references/clink-integ-cli-integration.md` | CLI-first Secret Key, catalog, checkout, webhook, and sandbox workflow |
 | `references/standard-integration.md` | Standard Clink integration workflow |
 | `references/new-user-onboarding.md` | New user onboarding and first sandbox checkout workflow |
 | `references/agent-prompt.zh-CN.md` | Chinese agent prompt reference |

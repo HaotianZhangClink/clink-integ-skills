@@ -1,4 +1,4 @@
-﻿import fs from "fs";
+import fs from "fs";
 import path from "path";
 import process from "process";
 import { fileURLToPath } from "url";
@@ -488,8 +488,45 @@ function check(condition, message) {
   if (!condition) failures.push(message);
 }
 
+function hasUtf8Bom(file) {
+  const bytes = fs.readFileSync(file);
+  return bytes.length >= 3 && bytes[0] === 0xef && bytes[1] === 0xbb && bytes[2] === 0xbf;
+}
+
+function isTextFile(file) {
+  const extension = path.extname(file).toLowerCase();
+  const basename = path.basename(file);
+  return [".md", ".mjs", ".js", ".json", ".yaml", ".yml", ".txt"].includes(extension) ||
+    [".gitignore", ".gitattributes"].includes(basename);
+}
+
+function collectTextFiles(directory) {
+  const files = [];
+  for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
+    if (entry.name === ".cache" || entry.name === "node_modules") continue;
+    const fullPath = path.join(directory, entry.name);
+    if (entry.isDirectory()) {
+      files.push(...collectTextFiles(fullPath));
+      continue;
+    }
+    if (entry.isFile() && isTextFile(fullPath)) {
+      files.push(fullPath);
+    }
+  }
+  return files;
+}
+
 for (const file of requiredFiles) {
   check(exists(file), `missing required file: ${file}`);
+}
+
+for (const file of collectTextFiles(repoRoot)) {
+  check(!hasUtf8Bom(file), `text file must not start with UTF-8 BOM: ${path.relative(repoRoot, file).replace(/\\/g, "/")}`);
+}
+
+if (exists("SKILL.md")) {
+  const skillBytes = fs.readFileSync(path.join(repoRoot, "SKILL.md"));
+  check(skillBytes.subarray(0, 4).equals(Buffer.from("---\n")), "SKILL.md must start with ---\\n frontmatter delimiter at byte 0");
 }
 
 for (const expectation of moduleExpectations) {

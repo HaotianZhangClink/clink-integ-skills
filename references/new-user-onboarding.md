@@ -1,4 +1,4 @@
-﻿# New User Onboarding
+# New User Onboarding
 
 ## Definition
 
@@ -67,7 +67,7 @@ Explain that the test environment uses a different domain and API key, and the u
 
 Use the maintainer-provided environment approval rule:
 
-- sandbox maps to UAT; sandbox registration is automatically approved and succeeds, so the user can directly initialize and obtain the sandbox Secret Key
+- sandbox is the user-facing name for the non-production API environment; sandbox registration is automatically approved and succeeds, so the user can directly initialize and obtain the sandbox Secret Key
 - sandbox registration requires invite code `JUSTCLINK`; after the user completes sandbox registration with that invite code, approval is automatic and succeeds
 - production registration requires approval before production key usage or go-live guidance; if the user is waiting on production approval, tell them they can proactively contact support
 

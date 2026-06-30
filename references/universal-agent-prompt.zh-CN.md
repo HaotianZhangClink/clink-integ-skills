@@ -1,11 +1,11 @@
-﻿# ClinkBill 通用建站 Agent 提示词
+# ClinkBill 通用建站 Agent 提示词
 
 把下面这段复制给任意可以帮你构建、修改或部署网站的 AI agent。若该 agent 支持技能调用，优先要求它使用 `$clink-integ-skills`。
 
 ```text
 请使用 $clink-integ-skills 帮我把 ClinkBill 支付接入到当前网站项目。
 
-目标：尽量全自动完成 ClinkBill UAT 支付接入。
+目标：尽量全自动完成 ClinkBill sandbox 测试支付接入。
 
 认证方式请按环境选择：
 - 优先使用当前 skill 内置的离线 CLI bundle：`vendor/clink-integ-cli/clink-integ-cli`；不要在正常执行时从 GitHub 或 npm 安装 `clink-integ-cli`。
@@ -17,7 +17,7 @@
 重要要求：
 
 1. 先侦察项目结构、启动方式、服务端入口、路由位置、环境变量方式、订单/购买入口和 webhook raw body 能力，再决定怎么接入。
-2. 如果项目没有可信后端，不要把 `CLINK_SECRET_KEY` 或 webhook signing key 放进前端代码，也不要让浏览器直接请求 Clink UAT API。
+2. 如果项目没有可信后端，不要把 `CLINK_SECRET_KEY` 或 webhook signing key 放进前端代码，也不要让浏览器直接请求 Clink sandbox API。
 3. 必须实现或验证 checkout session 服务端接口、subscription 服务端接口、webhook 接收接口、本地启动/验证方式、curl 示例、自动测试或 smoke test。
 4. 如果网站已有价格页、付费产品或订阅套餐，先按“运行中 API/价格页 DOM/hydrated JSON > 源码/配置 > 最后再问用户”的顺序扫描这些产品，并生成 `clink-catalog.json`，再用 `clink catalog validate/plan/import` 创建 Clink product/price；不要让我手动复制 productId/priceId。
 5. `clink-catalog.json` 里的每个 product 必须包含且只包含一个图片来源：`imageId`、`imageUrl` 或 `imageFile`。URL 必须写 `imageUrl`，本地 public/static 资源写 `imageFile`，不要把 URL 写进 `imageId`。运行 catalog 命令时，如项目有 public/static 目录，优先加 `--project-root . --public-dir public`。
@@ -26,8 +26,8 @@
 8. 有公网 HTTPS 域名就直接配置 webhook endpoint；只有纯本地 `localhost` / `127.0.0.1` 环境才需要 cloudflared tunnel。
 9. 不要把 webhook endpoint 管理说成 Dashboard-only；`clink dashboard webhook ensure` 只是兼容别名，优先使用 `clink webhook endpoint ensure`。
 10. webhook handler 必须用 `merchantReferenceId` + `sessionId` 双重匹配本地订单；如果两个字段指向不同本地订单，必须拒绝、隔离或升级处理，不能只依赖其中一个字段。
-11. 明确区分本地 mock、签名模拟 webhook、真实 UAT checkout session、真实 UAT 支付完成后的真实 webhook。
-12. 如果没有人打开 `checkoutUrl` 并完成 UAT 测试支付，不要把“真实 checkout session 创建成功 + 模拟 webhook 通过”说成“真实付款全链路完成”。即使真实 webhook 返回 200，也必须确认本地订单 paid/completed，并确认额度、权益、发货、下载权限或其他 fulfillment 已完成。
+11. 明确区分本地 mock、签名模拟 webhook、真实 sandbox checkout session、真实 sandbox 测试支付完成后的真实 webhook。
+12. 如果没有人打开 `checkoutUrl` 并完成 sandbox 测试支付，不要把“真实 checkout session 创建成功 + 模拟 webhook 通过”说成“真实付款全链路完成”。即使真实 webhook 返回 200，也必须确认本地订单 paid/completed，并确认额度、权益、发货、下载权限或其他 fulfillment 已完成。
 
 完成后请交付架构侦察结果、修改文件列表、新增 API route / service 说明、环境变量说明和 `.env.example`、一键启动命令、curl 示例、CLI 验证结果摘要、webhook endpoint、tunnel URL / 本地 URL、测试结果，以及剩余需要我人工完成的步骤。
 ```

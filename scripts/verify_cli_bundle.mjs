@@ -11,6 +11,7 @@ const skillRoot = path.resolve(scriptDir, "..");
 const bundlePath = path.join(skillRoot, "vendor", "clink-integ-cli", "clink-integ-cli");
 const manifestPath = path.join(skillRoot, "vendor", "clink-integ-cli", "manifest.json");
 const sumsPath = path.join(skillRoot, "vendor", "clink-integ-cli", "SHA256SUMS");
+const versionPath = path.join(skillRoot, "vendor", "clink-integ-cli", "VERSION");
 
 const failures = [];
 let checks = 0;
@@ -18,6 +19,22 @@ let checks = 0;
 check(fs.existsSync(bundlePath), `missing CLI bundle: ${bundlePath}`);
 check(fs.existsSync(manifestPath), `missing CLI bundle manifest: ${manifestPath}`);
 check(fs.existsSync(sumsPath), `missing CLI bundle checksum file: ${sumsPath}`);
+check(fs.existsSync(versionPath), `missing CLI bundle version file: ${versionPath}`);
+
+let expectedVersion = null;
+if (fs.existsSync(versionPath)) {
+  expectedVersion = fs.readFileSync(versionPath, "utf8").trim();
+  check(expectedVersion.length > 0, "CLI bundle VERSION must not be empty");
+}
+
+if (fs.existsSync(manifestPath)) {
+  const manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
+  check(manifest.name === "clink-integ-cli", "CLI bundle manifest name should be clink-integ-cli");
+  if (expectedVersion) {
+    check(manifest.version === expectedVersion, "CLI bundle manifest version must match VERSION");
+  }
+  check(manifest.bundle === "clink-integ-cli", "CLI bundle manifest should name the clink-integ-cli bundle");
+}
 
 if (fs.existsSync(bundlePath) && fs.existsSync(sumsPath)) {
   const bundle = fs.readFileSync(bundlePath);
@@ -34,7 +51,7 @@ if (fs.existsSync(bundlePath) && fs.existsSync(sumsPath)) {
 const capabilityChecks = [
   {
     args: ["--version"],
-    contains: ["0.1.14"],
+    contains: [expectedVersion || "__missing_version__"],
   },
   {
     args: ["--help"],

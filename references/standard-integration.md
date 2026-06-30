@@ -1,4 +1,4 @@
-﻿# Standard Integration
+# Standard Integration
 
 ## Definition
 
@@ -246,7 +246,7 @@ Do not describe `successUrl` alone as the authoritative payment confirmation sig
 
 Webhook HTTP 200 is not enough to call a real payment complete. A real-payment validation must also confirm the local order matched by both `merchantReferenceId` and `sessionId` is paid/completed and the merchant entitlement, credits, shipment, download access, or other fulfillment has completed.
 
-For sandbox/UAT card-binding payment tests after the integration is ready, remind the user that test card `4242424242424242` can be used with any 3-digit CVC and any future expiry date. Do not include this test-card guidance in production payment instructions.
+For sandbox card-binding payment tests after the integration is ready, remind the user that test card `4242424242424242` can be used with any 3-digit CVC and any future expiry date. Do not include this test-card guidance in production payment instructions.
 
 ### Step 7: Trigger Merchant Fulfillment After Payment
 
