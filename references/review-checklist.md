@@ -25,6 +25,8 @@ This file is for final review and self-check. It is not the primary workflow doc
 - does it avoid putting URL strings in `imageId`, using `imageUrl` for URLs and `imageFile` for local public/static assets
 - for non-registered product mode, does it explain how merchant-defined line items are built into `priceDataList`
 - for non-registered product mode, does it keep merchant-specific business inputs in the merchant order model
+- does it preserve trusted local `clink checkout` full-payload operation while limiting generated public starters to a server-defined `priceKey` or `planKey`
+- for generated public starters, are amount, currency, product/price IDs, `merchantReferenceId`, return URLs, and payment settings server-authoritative rather than accepted from the client
 - for subscription purchases, does it explain whether the flow should create a new checkout session or route to customer portal
 - does checkout map merchant `order_id` to `merchantReferenceId`
 - does the design avoid treating `merchantReferenceId` as an idempotency key
@@ -44,16 +46,19 @@ This file is for final review and self-check. It is not the primary workflow doc
 - does it verify the CLI request domain with `clink env list` or `clink env show <name> --json` before write commands
 - if a custom request domain is needed, does it use `clink env add <name> --api-base-url <url>` and then `--env <name>` or `CLINK_ENV` instead of scattering raw URLs through generated code
 - are `--base-url` and `CLINK_BASE_URL` treated as documented one-off overrides, not as a way to bypass production validation
+- does authenticated `clink api request` receive only a relative path below the configured base, with no absolute URL, scheme-relative URL, backslash, parent traversal, origin override, or base-path escape
 - after `CLINK_SECRET_KEY` is configured, does it avoid requiring a Dashboard Console token for catalog import, checkout/subscription APIs, webhook endpoint management, doctor, smoke-test, or local webhook commands
 - when a Secret Key is requested or configured, does the output tell the user to get it from `Merchant Dashboard > Developers > API Keys` by clicking `Initialize Key`, copying it once, and storing it securely
 - does the output avoid asking the user to paste real webhook signing keys or Secret Keys into chat, generated source code, docs, logs, or public repositories
+- on POSIX systems, are CLI profiles and `.env` files that contain secrets required to have mode `0600`, including after updating an existing broader-permission file
 - does webhook coverage include subscription lifecycle events when the product mode is subscription-based
 - does webhook coverage include `order.refunded` or equivalent refunded-state handling when that state exists in the merchant order model
 - does webhook implementation include signature verification, idempotency, retry handling, and out-of-order tolerance
 - does signature verification use the unmodified raw body before parsing or normalization
+- does the handler accept only integer second or millisecond `X-Clink-Timestamp` values within a 300-second past-or-future window
 - does canonical fixture guidance require `event_`, `object: "event"`, integer millisecond `created`, object-valued `data.object`, Invoice `items`, and no default outer `livemode`
-- are malformed payloads and unknown event types rejected with non-2xx responses and retries deduplicated by `event.id`
-- is `--fixture-profile legacy` explicit and deprecated, and are fixture/simulate/local replay results kept distinct from real Clink sandbox Merchant Webhook UAT
+- are malformed payloads and unknown event types rejected with non-2xx responses and retries deduplicated through a durable Inbox keyed by `event.id`, including inside the timestamp window
+- is `--fixture-profile legacy` explicit and deprecated, and are fixture/simulate/local replay results identified as local inputs rather than Clink server events and kept distinct from real Clink sandbox Merchant Webhook UAT
 - does webhook reconciliation match both `merchantReferenceId` and `sessionId` when both are available, and quarantine mismatches instead of relying on one field
 - does the design avoid treating `successUrl` as the only confirmation signal
 - does real-payment validation require local order paid/completed plus entitlement/fulfillment completion, not just webhook HTTP 200

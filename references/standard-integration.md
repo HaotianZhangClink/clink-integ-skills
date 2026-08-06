@@ -43,6 +43,8 @@ Do not invent `productId` or `priceId`.
 
 In a typical registered-product implementation, the merchant frontend selects from products and prices that the merchant backend or frontend fetched from Clink first. If the merchant's site already has a pricing page, CMS plan list, or subscription catalog, the agent should generate `clink-catalog.json` and use `clink catalog validate`, `clink catalog plan`, and `clink catalog import` before asking the user to manually copy product or price IDs.
 
+For a generated public starter, expose only an opaque `priceKey` or `planKey` from a server-side allowlist. The starter server resolves that key to the active `productId`, `priceId`, amount, currency, return URLs, and payment settings; it must not trust those fields from the browser.
+
 Product discovery order:
 
 1. Inspect running application APIs, rendered pricing DOM, hydrated JSON, and visible pricing page state.
@@ -65,6 +67,8 @@ Expected behavior:
 - keep merchant-specific business inputs such as account identifiers, recharge targets, or custom fulfillment fields in the merchant order context
 
 Do not treat non-registered product mode as "no local order model needed". The merchant still owns product meaning, pricing intent, and fulfillment context.
+
+Non-registered mode remains supported, but a generated public starter must resolve an allowed server-side key to its line-item data. Do not let the browser define or override the item name, unit amount, currency, identifiers, return URLs, payment settings, or `merchantReferenceId`.
 
 ### Step 2: Resolve The Purchase Path
 
@@ -99,6 +103,8 @@ Important:
 - `merchantReferenceId` is not an idempotency key
 - merchant systems must implement their own idempotency and duplicate prevention
 - merchant-specific business data should remain in the local order record so it can be used later for fulfillment or support workflows
+
+Trusted local `clink checkout` commands may continue to accept a complete operator-controlled payload. That capability is separate from a generated public HTTP starter: its server creates or loads the local order, derives `merchantReferenceId`, and resolves `priceKey` or `planKey` before calling Clink.
 
 ### Step 4: Integrate The Merchant Frontend
 
@@ -136,6 +142,8 @@ clink auth status --json
 ```
 
 Use `sandbox` unless the user or maintainer has explicitly provided a registered custom non-production CLI environment. For a custom request domain, first run `clink env add <name> --api-base-url <url>`, confirm it with `clink env show <name> --json`, and then pass `--env <name>` or set `CLINK_ENV=<name>`. Use `--base-url` or `CLINK_BASE_URL` only as a documented one-off override.
+
+For authenticated `clink api request`, pass only a relative path below that configured API base. Request input must not replace the selected origin or escape the base pathname through an absolute URL, scheme-relative URL, backslash, parent traversal, or encoded equivalent.
 
 Then configure the public HTTPS endpoint:
 
@@ -193,18 +201,20 @@ The default CLI is the offline bundle in `vendor/clink-integ-cli/clink-integ-cli
 
 In browserless, cloud IDE, low-code, or sandbox environments where `clink login` cannot run, ask only for `CLINK_SECRET_KEY`. Tell the user the retrieval path and method: go to `Merchant Dashboard > Developers > API Keys`, click `Initialize Key`, then copy and securely store the Secret Key because it is displayed only once. Do not put the real Secret Key in frontend code, chat, generated source, docs, logs, public repositories, or final answers.
 
+On POSIX systems, CLI profiles and `.env` files containing Secret Keys or webhook signing secrets must have mode `0600`; writing a secret must tighten an existing broader mode such as `0644`.
+
 #### Server Implementation
 
 The merchant backend should:
 
 - expose an HTTPS endpoint
-- read `X-Clink-Timestamp`
+- read `X-Clink-Timestamp` as an integer Unix-seconds or Unix-milliseconds value and reject values outside a 300-second past-or-future window
 - read `X-Clink-Signature`
 - preserve the unmodified raw event body and verify it before JSON parsing or profile normalization
 - verify HMAC SHA-256 over `X-Clink-Timestamp + "." + raw event body` with the webhook signing key
 - validate the canonical Merchant Webhook envelope: an `event_` ID, `object: "event"`, integer Unix-millisecond `created`, and an object-valued `data.object`; Invoice resources use `items`, not `lineItems`, and the default envelope has no outer `livemode`
 - reject malformed payloads and unknown event types with a non-2xx response
-- deduplicate retries by `event.id` and implement idempotent processing
+- use a durable Inbox keyed by `event.id` to deduplicate retries even inside the accepted timestamp window and implement idempotent processing
 - handle retries safely
 - tolerate out-of-order delivery
 - reconcile payment events against the local checkout/order using both `merchantReferenceId` and `sessionId` when both are present

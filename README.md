@@ -38,6 +38,10 @@ node "$CLINK_INTEG_CLI" auth status --json
 
 After either path, product catalog import, checkout/subscription calls, webhook endpoint management, doctor, smoke-test, and local webhook commands should run with Secret Key authentication and should not require Playwright or network package installation.
 
+Authenticated `clink api request` input is restricted to a relative path below the configured API base. It cannot override the selected base origin or escape its base pathname with an absolute URL, scheme-relative URL, backslash, or parent path. On POSIX systems, CLI profiles and `.env` files containing Secret Keys or webhook signing secrets must be stored with mode `0600`.
+
+The trusted local `clink checkout` commands retain their full operator-facing payload capability. Generated public checkout starters have a narrower trust boundary: callers select only a server-defined `priceKey` or `planKey`, while the server owns the amount, currency, product/price IDs, `merchantReferenceId`, return URLs, and payment settings. Replace the starter's example allowlist with a server-side catalog or order store before production; do not treat `merchantReferenceId` as an idempotency key.
+
 Regenerate and verify the offline bundle only when updating the vendored CLI:
 
 ```bash
@@ -64,7 +68,7 @@ Endpoint ensure validates selected events against runtime `GET /webhook/events` 
 
 After `--save-secret`, the agent must sync the returned or rotated signing secret into the merchant runtime as `CLINK_WEBHOOK_SIGNING_KEY`, then restart or redeploy the app. A webhook URL change requires running `ensure` again and repeating the sync.
 
-The default local Merchant Webhook fixture uses an `event_` ID, `object: "event"`, integer Unix-millisecond `created`, an object-valued `data.object`, Invoice `items`, and no outer `livemode`. The flattened `--fixture-profile legacy` shape is deprecated and must be selected explicitly. `clink webhook fixture` and `clink webhook simulate` are local validation tools, not proof of a real Clink sandbox Merchant Webhook UAT; handlers must verify the unmodified raw body before parsing, reject malformed or unknown events with non-2xx responses, and deduplicate retries by `event.id`.
+The default local Merchant Webhook fixture uses an `event_` ID, `object: "event"`, integer Unix-millisecond `created`, an object-valued `data.object`, Invoice `items`, and no outer `livemode`. The flattened `--fixture-profile legacy` shape is deprecated and must be selected explicitly. `clink webhook fixture` and `clink webhook simulate` are local validation tools, not Clink server events and not proof of a real Clink sandbox Merchant Webhook UAT. Handlers must accept only integer second or millisecond `X-Clink-Timestamp` values within 300 seconds, verify the unmodified raw body before JSON parsing, reject malformed or unknown events with non-2xx responses, and use a durable Inbox keyed by `event.id` even inside that time window.
 
 ## What The Skill Covers
 

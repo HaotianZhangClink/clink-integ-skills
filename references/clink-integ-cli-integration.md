@@ -97,6 +97,8 @@ Selection priority for CLI requests:
 
 `--base-url <url>` and `CLINK_BASE_URL` override the resolved API base URL for one-off debugging. Treat them as temporary overrides, document why they are used, and do not use them to bypass the production validation gate. If the override points at production or a production-like domain, run the production validation workflow first.
 
+Authenticated `clink api request` input is not another environment override. Pass only a relative API path that resolves below the configured base pathname. Absolute URLs, scheme-relative URLs, backslashes, parent traversal, and encoded path escapes must be rejected; neither the configured origin nor its API base path may be replaced by request input.
+
 ## Authentication
 
 Prefer Secret Key authentication.
@@ -140,6 +142,8 @@ node "$CLINK_INTEG_CLI" dashboard apikey ensure-secret --save --show-secret --js
 Parse the value locally and write it to the runtime secret destination. Do not print the raw Secret Key in chat, generated docs, logs, source code, README files, test fixtures, or the final answer.
 
 After this point, product catalog import, checkout/subscription calls, webhook endpoint management, API request, doctor, smoke-test, and local webhook commands should use Secret Key authentication and should not require a Dashboard Console token.
+
+On POSIX systems, treat the CLI profile and every `.env` file populated with a Secret Key or webhook signing secret as private files with mode `0600`. An existing broader mode such as `0644` must be tightened when the secret is written; do not rely only on the process umask.
 
 ### Path B: Cloud, Low-Code, Sandbox, Or Browserless
 
@@ -227,6 +231,8 @@ Implement server-side routes for:
 - checkout session creation
 - subscription creation when the product flow needs recurring payments
 - webhook reception and signature verification
+
+Keep the trusted local `clink checkout` commands available for operator-controlled workflows that intentionally supply a complete payload. Do not expose that trust model through a generated public starter route. A public starter accepts only a server-defined `priceKey` or `planKey`; its server-side catalog or order loader owns the amount, currency, product and price IDs, `merchantReferenceId`, success/cancel URLs, and payment settings. Replace the example allowlist with the merchant's server-side catalog or order store before production. The client may choose an allowed item, but it must not define or override price-bearing fields or identifiers.
 
 The server must send:
 
@@ -388,14 +394,14 @@ The flattened legacy shape remains available only through explicit `--fixture-pr
 The webhook route must:
 
 - preserve the unmodified raw request body and verify its signature before JSON parsing or profile normalization
-- read `X-Clink-Timestamp`
+- read `X-Clink-Timestamp` as an integer Unix-seconds or Unix-milliseconds value and reject non-integers, stale values, and future values outside a 300-second window
 - read `X-Clink-Signature`
 - verify HMAC SHA-256 over `X-Clink-Timestamp + "." + rawBody`
 - compare signatures safely
 - validate the canonical envelope and require an object-valued `data.object`
 - reject malformed payloads and unknown event types with a non-2xx response rather than acknowledging them silently
-- reject stale or replayed deliveries
-- deduplicate repeated deliveries by `event.id` and process them idempotently
+- reject deliveries outside the timestamp window; the window limits signature replay exposure but is not delivery deduplication
+- record deliveries in a durable Inbox keyed by `event.id` and deduplicate repeated deliveries even when their timestamp is inside the accepted window
 - handle retries safely
 - tolerate out-of-order events
 - reconcile local orders using both `merchantReferenceId` and `sessionId` when both are available; never rely on only one field when the local checkout record contains both
