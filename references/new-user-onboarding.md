@@ -133,10 +133,16 @@ Do not initially ask the user for `CLINK_WEBHOOK_SIGNING_KEY`. After the server 
 ```bash
 clink webhook endpoint ensure \
   --url <public-webhook-url> \
-  --events core \
+  --events commerce \
   --save-secret \
   --json
 ```
+
+Use `commerce` while onboarding a complete charging or subscription integration. If the product path is already known, a one-time checkout may use `checkout,disputes`; a subscription integration must use at least `checkout,subscriptions,disputes`; add `payment-methods` when saved payment methods must be synchronized.
+
+Endpoint ensure validates selected events against runtime `GET /webhook/events` and merges existing endpoint events by default. Use `--allow-remove-events` only when replacement and removal are explicitly intended. Stable `commerce` remains a 31-event preset; future Catalog events such as `payment_method.deleted` are available through dynamic `all` or explicit selection, not by silently changing `commerce`.
+
+`core` is compatibility-only or for a minimal demo. Its exact six events are `session.complete`, `order.succeeded`, `order.failed`, `refund.succeeded`, `subscription.created`, and `invoice.paid`. Warning: it omits `subscription.cancelled`, `subscription.past_due`, `subscription.updated.*`, `invoice.open/void`, `dispute.*`, `refund.failed`, and `session.expired`; migrate existing `core` endpoints to `commerce` for complete charging coverage.
 
 Then:
 
@@ -152,12 +158,16 @@ Webhook implementation must verify:
 
 - `X-Clink-Timestamp`
 - `X-Clink-Signature`
-- HMAC SHA-256 over `X-Clink-Timestamp + "." + raw event body`
-- idempotency
+- HMAC SHA-256 over `X-Clink-Timestamp + "." + unmodified raw event body` before JSON parsing or normalization
+- the canonical envelope (`event_` ID, `object: "event"`, integer millisecond `created`, object-valued `data.object`, Invoice `items`, and no default outer `livemode`)
+- malformed payload and unknown event rejection with non-2xx responses
+- idempotency and retry deduplication by `event.id`
 - retry safety
 - out-of-order event tolerance
 
 Mention that Clink retries delivery up to 10 times with exponential backoff and does not guarantee event order.
+
+Default `clink webhook fixture` and `clink webhook simulate` output is local canonical fixture/replay data. The explicit `--fixture-profile legacy` shape is deprecated compatibility input. Neither local path proves real Clink sandbox Merchant Webhook UAT; require an actual Clink-to-endpoint delivery before reporting real webhook E2E completion.
 
 ### Step 6: First Checkout Session
 

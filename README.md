@@ -50,13 +50,21 @@ Webhook endpoint management should be done through the Secret Key API path:
 ```bash
 clink webhook endpoint ensure \
   --url https://example.com/api/clink/webhook \
-  --events core \
+  --events commerce \
   --save-secret \
   --sync-env-file .env.local \
   --json
 ```
 
+Use `commerce` for a complete charging or subscription integration. A one-time checkout can use `checkout,disputes`; a subscription integration must use at least `checkout,subscriptions,disputes`; add `payment-methods` when saved payment methods must be synchronized, or keep `commerce`.
+
+`core` is compatibility-only and suitable only for a minimal demo. Its exact six events are `session.complete`, `order.succeeded`, `order.failed`, `refund.succeeded`, `subscription.created`, and `invoice.paid`. It omits `subscription.cancelled`, `subscription.past_due`, `subscription.updated.*`, `invoice.open/void`, `dispute.*`, `refund.failed`, and `session.expired`; existing `core` endpoints should migrate to `commerce` for complete charging coverage.
+
+Endpoint ensure validates selected events against runtime `GET /webhook/events` and merges with an existing endpoint's events by default. Use `--allow-remove-events` only when replacing the event set and deleting existing events is explicitly intended. The versioned `commerce` preset remains a stable 31-event set; future Catalog events such as `payment_method.deleted` are available only through dynamic `all` or an explicit event selection until a later preset version changes that contract.
+
 After `--save-secret`, the agent must sync the returned or rotated signing secret into the merchant runtime as `CLINK_WEBHOOK_SIGNING_KEY`, then restart or redeploy the app. A webhook URL change requires running `ensure` again and repeating the sync.
+
+The default local Merchant Webhook fixture uses an `event_` ID, `object: "event"`, integer Unix-millisecond `created`, an object-valued `data.object`, Invoice `items`, and no outer `livemode`. The flattened `--fixture-profile legacy` shape is deprecated and must be selected explicitly. `clink webhook fixture` and `clink webhook simulate` are local validation tools, not proof of a real Clink sandbox Merchant Webhook UAT; handlers must verify the unmodified raw body before parsing, reject malformed or unknown events with non-2xx responses, and deduplicate retries by `event.id`.
 
 ## What The Skill Covers
 

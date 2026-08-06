@@ -43,13 +43,21 @@ webhook endpoint 应通过 Secret Key API 路径管理：
 ```bash
 clink webhook endpoint ensure \
   --url https://example.com/api/clink/webhook \
-  --events core \
+  --events commerce \
   --save-secret \
   --sync-env-file .env.local \
   --json
 ```
 
+完整收费或订阅接入使用 `commerce`。仅一次性 Checkout 可以使用 `checkout,disputes`；订阅接入至少使用 `checkout,subscriptions,disputes`；如果还要同步保存的支付方式，在组合中加入 `payment-methods`，或继续使用 `commerce`。
+
+`core` 只用于向后兼容或最小演示。它固定只有 `session.complete`、`order.succeeded`、`order.failed`、`refund.succeeded`、`subscription.created`、`invoice.paid` 六个事件，会遗漏 `subscription.cancelled`、`subscription.past_due`、`subscription.updated.*`、`invoice.open/void`、`dispute.*`、`refund.failed` 和 `session.expired`；已有 `core` endpoint 应迁移到 `commerce`，才能覆盖完整收费生命周期。
+
+Endpoint ensure 会先用运行时 `GET /webhook/events` 校验所选事件，并默认合并 endpoint 已有事件。只有明确要替换集合并删除已有事件时才使用 `--allow-remove-events`。版本化的 `commerce` 固定为 31 个事件；未来 Catalog 中即使出现 `payment_method.deleted`，也只能通过动态 `all` 或显式事件选择使用，不能让稳定预设静默扩容。
+
 执行 `--save-secret` 后，agent 必须把返回或轮换后的 signing secret 同步到项目运行环境的 `CLINK_WEBHOOK_SIGNING_KEY`，然后重启或重新部署服务。webhook URL 每次变化都要重新运行 `ensure` 并重新同步密钥。
+
+默认本地 Merchant Webhook fixture 使用 `event_` ID、`object: "event"`、Unix 毫秒整数 `created`、对象形式的 `data.object`、Invoice `items`，且不带外层 `livemode`。摊平的 `--fixture-profile legacy` 结构已经 deprecated，只能显式选择。`clink webhook fixture` 和 `clink webhook simulate` 只是本地验证工具，不能证明真实 Clink sandbox Merchant Webhook UAT 已通过；handler 必须先对未经修改的 raw body 验签，再解析，非法载荷或未知事件必须返回非 2xx，并按 `event.id` 对重试去重。
 
 ## Skill 能力
 

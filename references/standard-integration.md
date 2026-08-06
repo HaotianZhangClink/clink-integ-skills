@@ -142,7 +142,7 @@ Then configure the public HTTPS endpoint:
 ```bash
 clink webhook endpoint ensure \
   --url <public-webhook-url> \
-  --events core \
+  --events commerce \
   --save-secret \
   --sync-env-file .env.local \
   --json
@@ -154,11 +154,15 @@ The merchant or agent should:
 
 1. use an existing public HTTPS domain when available
 2. use a tunnel only for pure local `localhost` development
-3. subscribe to `--events core` or the smallest event-name list required by the product flow
+3. select `--events commerce` for a complete charging or subscription integration; use `checkout,disputes` for one-time checkout, at least `checkout,subscriptions,disputes` for subscriptions, and add `payment-methods` when saved payment methods must be synchronized
 4. save or capture the returned signing secret
 5. store the signing secret in the merchant server's secret manager or environment configuration as `CLINK_WEBHOOK_SIGNING_KEY`
 6. restart or redeploy the server after updating the signing secret
 7. rerun endpoint ensure and repeat the sync when the webhook URL changes
+
+Endpoint ensure validates selected events against runtime `GET /webhook/events` and merges the endpoint's existing events by default. Use `--allow-remove-events` only when replacing the set and removing existing events is explicitly authorized. Stable `commerce` contains 31 events; a future runtime event such as `payment_method.deleted` is available through dynamic `all` or explicit selection, but must not silently expand `commerce`.
+
+`core` is compatibility-only or for a minimal demo. It contains exactly `session.complete`, `order.succeeded`, `order.failed`, `refund.succeeded`, `subscription.created`, and `invoice.paid`. Warning: it omits `subscription.cancelled`, `subscription.past_due`, `subscription.updated.*`, `invoice.open/void`, `dispute.*`, `refund.failed`, and `session.expired`. Do not use it as a complete charging, subscription, or production recommendation; migrate existing `core` endpoints to `commerce`.
 
 Do not ask the user to provide `CLINK_WEBHOOK_SIGNING_KEY` at the beginning of the integration. The signing key should come from `clink webhook endpoint ensure --save-secret`. If a platform Secret API requires plaintext, use `--show-secret` only in the controlled write step and never include the raw value in the final answer.
 
@@ -196,40 +200,23 @@ The merchant backend should:
 - expose an HTTPS endpoint
 - read `X-Clink-Timestamp`
 - read `X-Clink-Signature`
-- preserve the raw event body before JSON parsing
+- preserve the unmodified raw event body and verify it before JSON parsing or profile normalization
 - verify HMAC SHA-256 over `X-Clink-Timestamp + "." + raw event body` with the webhook signing key
-- implement idempotency
+- validate the canonical Merchant Webhook envelope: an `event_` ID, `object: "event"`, integer Unix-millisecond `created`, and an object-valued `data.object`; Invoice resources use `items`, not `lineItems`, and the default envelope has no outer `livemode`
+- reject malformed payloads and unknown event types with a non-2xx response
+- deduplicate retries by `event.id` and implement idempotent processing
 - handle retries safely
 - tolerate out-of-order delivery
 - reconcile payment events against the local checkout/order using both `merchantReferenceId` and `sessionId` when both are present
 - reject, quarantine, or escalate events where `merchantReferenceId` and `sessionId` resolve to different local orders
 
-Primary event groups for this path:
-
-- `session.complete`
-- `order.succeeded`
-- `order.failed`
-- `refund.succeeded`
-- `subscription.created`
-- `invoice.paid`
-
 Prefer backend webhook-driven state synchronization over relying only on frontend redirects.
 
-For registered-product subscription flows, webhook handling should usually cover:
+For registered-product subscription flows, use `commerce` by default or at least `checkout,subscriptions,disputes`; this covers checkout, recurring invoices, trialing, past due, cancellation, subscription updates, refunds, and disputes needed for entitlement changes. Add `payment-methods` when the merchant persists saved payment-method state.
 
-- `order.created`
-- `order.succeeded`
-- `order.failed`
-- `subscription.created`
-- `subscription.activated`
-- other relevant subscription lifecycle updates such as trialing, past due, or cancellation when used by the merchant product model
+For non-registered one-time purchase flows, use `checkout,disputes`. Map `refund.created`, `refund.succeeded`, and `refund.failed` into the merchant's refunded-state lifecycle. Do not invent an `order.refunded` webhook event merely because the merchant order model exposes a refunded state.
 
-For non-registered product flows, webhook handling should usually cover:
-
-- `order.created`
-- `order.succeeded`
-- `order.failed`
-- `order.refunded` when the merchant order model exposes refunded state
+Default `clink webhook fixture` and `clink webhook simulate` output is a local canonical fixture/replay, not a real Clink sandbox Merchant Webhook UAT. The deprecated flattened shape may be tested only with explicit `--fixture-profile legacy`. Claim real sandbox webhook E2E only after an actual Clink-to-endpoint delivery is observed.
 
 ### Step 6: Reconcile After Return
 

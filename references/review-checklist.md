@@ -29,7 +29,10 @@ This file is for final review and self-check. It is not the primary workflow doc
 - does checkout map merchant `order_id` to `merchantReferenceId`
 - does the design avoid treating `merchantReferenceId` as an idempotency key
 - does the design keep `originalAmount` aligned with the merchant-defined checkout payload
-- does webhook implementation include endpoint registration through `clink webhook endpoint ensure --events core --save-secret --json` or a clearly identified fallback
+- does a complete charging/subscription implementation use `clink webhook endpoint ensure --events commerce --save-secret --json`, with only scenario-safe narrower scopes (`checkout,disputes`; at least `checkout,subscriptions,disputes`; optional `payment-methods`)
+- does review inspect the actual endpoint command, verify runtime Catalog validation and default merge semantics, and allow `--allow-remove-events` only for explicit replacement
+- does stable `commerce` remain 31 events without silently adding a future `payment_method.deleted`
+- if `core` appears for compatibility/minimal demo, is it beside its exact events (`session.complete`, `order.succeeded`, `order.failed`, `refund.succeeded`, `subscription.created`, `invoice.paid`), the omissions `subscription.cancelled`, `subscription.past_due`, `subscription.updated.*`, `invoice.open/void`, `dispute.*`, `refund.failed`, `session.expired`, and a migration recommendation to `commerce`
 - when Dashboard webhook visibility or manual fallback is mentioned, does the output identify `Merchant Dashboard > Developers > Webhooks` while keeping `clink webhook endpoint ensure` as the default path
 - does webhook setup sync the returned or rotated signing secret into the merchant runtime as `CLINK_WEBHOOK_SIGNING_KEY`
 - for local `.env` apps, does webhook setup use `clink webhook endpoint ensure --save-secret --sync-env-file <env-file>` or an equivalent automated env write
@@ -47,6 +50,10 @@ This file is for final review and self-check. It is not the primary workflow doc
 - does webhook coverage include subscription lifecycle events when the product mode is subscription-based
 - does webhook coverage include `order.refunded` or equivalent refunded-state handling when that state exists in the merchant order model
 - does webhook implementation include signature verification, idempotency, retry handling, and out-of-order tolerance
+- does signature verification use the unmodified raw body before parsing or normalization
+- does canonical fixture guidance require `event_`, `object: "event"`, integer millisecond `created`, object-valued `data.object`, Invoice `items`, and no default outer `livemode`
+- are malformed payloads and unknown event types rejected with non-2xx responses and retries deduplicated by `event.id`
+- is `--fixture-profile legacy` explicit and deprecated, and are fixture/simulate/local replay results kept distinct from real Clink sandbox Merchant Webhook UAT
 - does webhook reconciliation match both `merchantReferenceId` and `sessionId` when both are available, and quarantine mismatches instead of relying on one field
 - does the design avoid treating `successUrl` as the only confirmation signal
 - does real-payment validation require local order paid/completed plus entitlement/fulfillment completion, not just webhook HTTP 200
@@ -88,7 +95,7 @@ This file is for final review and self-check. It is not the primary workflow doc
 - does it tell the user to confirm merchant selection and merchant profile under `Settings > Merchant`
 - does it explain team access through `Settings > Users` and avoid giving Developer access to roles that docs say do not have it
 - does it include Secret Key retrieval through `Merchant Dashboard > Developers > API Keys` and `Initialize Key`
-- does it include CLI webhook endpoint ensure and signing-secret sync instead of defaulting to manual Dashboard webhook setup
+- does it include a scenario-safe CLI webhook endpoint ensure command (default `commerce`) and signing-secret sync instead of defaulting to manual Dashboard webhook setup
 - does it distinguish registered product mode from non-registered product mode before first checkout setup
 - does it explain that subscription recurring payments require pre-created products according to the checkout docs
 - does it route the user to standard integration, generic agent integration, OpenClaw integration, or validation after onboarding
