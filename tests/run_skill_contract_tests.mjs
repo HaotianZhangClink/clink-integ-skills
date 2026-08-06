@@ -276,6 +276,64 @@ function main() {
     "vendored node invocation should not bypass core safety"
   );
 
+  const bashEnvBundle = lintWebhookDesign(`
+    This is a complete billing integration.
+    Run node "$CLINK_INTEG_CLI" webhook endpoint ensure --url https://example.com/api/clink/webhook --events commerce --save-secret --json.
+    Store and sync the returned webhook signing key as CLINK_WEBHOOK_SIGNING_KEY in the platform Secret manager.
+    Restart the service after the secret sync.
+    Verify X-Clink-Timestamp and X-Clink-Signature.
+    Make processing idempotent, handle retries, and tolerate out-of-order delivery.
+  `);
+  check(bashEnvBundle.valid === true, "$CLINK_INTEG_CLI invocation should pass webhook validation");
+
+  const bracedBashCommand = [
+    'node "${CLINK_INTEG_CLI}" \\',
+    "  webhook endpoint ensure \\",
+    "  --url https://example.com/api/clink/webhook \\",
+    "  --events commerce \\",
+    "  --save-secret --json",
+  ].join("\n");
+  const bracedBashEnvBundle = lintWebhookDesign(`
+    This is a complete billing integration.
+    ${bracedBashCommand}
+    Store and sync the returned webhook signing key as CLINK_WEBHOOK_SIGNING_KEY in the platform Secret manager.
+    Restart the service after the secret sync.
+    Verify X-Clink-Timestamp and X-Clink-Signature.
+    Make processing idempotent, handle retries, and tolerate out-of-order delivery.
+  `);
+  check(bracedBashEnvBundle.valid === true, "multiline ${CLINK_INTEG_CLI} invocation should pass webhook validation");
+
+  const powershellCommand = [
+    'node "$env:CLINK_INTEG_CLI" `',
+    "  webhook endpoint ensure `",
+    "  --url https://example.com/api/clink/webhook `",
+    "  --events commerce `",
+    "  --save-secret --json",
+  ].join("\n");
+  const powershellEnvBundle = lintWebhookDesign(`
+    This is a complete billing integration.
+    ${powershellCommand}
+    Store and sync the returned webhook signing key as CLINK_WEBHOOK_SIGNING_KEY in the platform Secret manager.
+    Restart the service after the secret sync.
+    Verify X-Clink-Timestamp and X-Clink-Signature.
+    Make processing idempotent, handle retries, and tolerate out-of-order delivery.
+  `);
+  check(powershellEnvBundle.valid === true, "multiline PowerShell CLINK_INTEG_CLI invocation should pass webhook validation");
+
+  const envBundleCore = lintWebhookDesign(`
+    This is a complete billing integration.
+    Run node "$CLINK_INTEG_CLI" webhook endpoint ensure --url https://example.com/api/clink/webhook --events core --save-secret --json.
+    Store and sync the returned webhook signing key as CLINK_WEBHOOK_SIGNING_KEY in the platform Secret manager.
+    Restart the service after the secret sync.
+    Verify X-Clink-Timestamp and X-Clink-Signature.
+    Make processing idempotent, handle retries, and tolerate out-of-order delivery.
+  `);
+  check(envBundleCore.valid === false, "environment-variable bundle invocation must not bypass core safety");
+  check(
+    envBundleCore.errors.some((item) => item.includes("actual --events core ensure command")),
+    "environment-variable bundle core should report the unsafe actual command"
+  );
+
   const validSubscriptionPresets = lintWebhookDesign(`
     This subscription integration handles renewal, cancellation, past_due, and entitlement changes.
     Run clink webhook endpoint ensure --url https://example.com/api/clink/webhook --events checkout,subscriptions,disputes --save-secret --json.

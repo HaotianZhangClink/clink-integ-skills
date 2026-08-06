@@ -44,6 +44,7 @@ if (fs.existsSync(bundlePath) && fs.existsSync(sumsPath)) {
   check(actual === expected, "CLI bundle SHA256 does not match SHA256SUMS");
   check(!text.includes("readPackageJson"), "CLI bundle should not read package.json for its version");
   check(!text.includes("github:"), "CLI bundle must not instruct GitHub package installs");
+  check(!/clink-integ-cli-bundle-[^/\r\n]+\/entry\.ts/.test(text), "CLI bundle must not embed a random temporary build path");
   check(!text.includes("npm install --prefix ./.clink-tools playwright"), "CLI bundle must not instruct remote Playwright installs");
   check(!text.includes("npm install -g playwright"), "CLI bundle must not instruct global Playwright installs");
 }
@@ -183,6 +184,29 @@ if (fs.existsSync(bundlePath)) {
   }
 }
 
+if (fs.existsSync(bundlePath) && process.platform !== "win32") {
+  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "clink-integ-cli-mode-"));
+  try {
+    const existingConfig = path.join(tempDir, "existing-config.json");
+    fs.writeFileSync(existingConfig, '{"defaultProfile":"default","profiles":{}}\n', { mode: 0o600 });
+    fs.chmodSync(existingConfig, 0o600);
+    runSecretSet(existingConfig, "sk_test_bundle_existing_mode_1234567890");
+    check(
+      (fs.statSync(existingConfig).mode & 0o777) === 0o600,
+      "CLI bundle must preserve an existing config file mode of 0600",
+    );
+
+    const newConfig = path.join(tempDir, "new-config.json");
+    runSecretSet(newConfig, "sk_test_bundle_new_mode_1234567890");
+    check(
+      (fs.statSync(newConfig).mode & 0o777) === 0o600,
+      "CLI bundle must create a new config file with mode 0600",
+    );
+  } finally {
+    fs.rmSync(tempDir, { recursive: true, force: true });
+  }
+}
+
 if (failures.length > 0) {
   console.error(`FAIL: ${failures.length} CLI bundle checks failed`);
   for (const failure of failures) console.error(`- ${failure}`);
@@ -231,4 +255,28 @@ function writeCatalogWithImageFile(tempDir) {
     "utf8"
   );
   return catalogPath;
+}
+
+function runSecretSet(configPath, secret) {
+  execFileSync(process.execPath, [
+    bundlePath,
+    "--json",
+    "auth",
+    "secret",
+    "set",
+    "--api-key",
+    secret,
+    "--env",
+    "sandbox",
+  ], {
+    encoding: "utf8",
+    env: {
+      ...process.env,
+      CLINK_CONFIG_PATH: configPath,
+      CLINK_SECRET_KEY: "",
+      CLINK_API_KEY: "",
+      CLINK_WEBHOOK_SIGNING_KEY: "",
+      CLINK_WEBHOOK_SECRET: "",
+    },
+  });
 }

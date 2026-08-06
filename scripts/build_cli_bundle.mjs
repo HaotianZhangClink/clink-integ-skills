@@ -193,6 +193,10 @@ async function rewriteOfflineLoginGuidance(file) {
   let generated = await fs.readFile(file, "utf8");
   generated = generated
     .replace(
+      /^\/\/ .*\/clink-integ-cli-bundle-[^/\r\n]+\/entry\.ts$/m,
+      "// clink-integ-cli-bundle/entry.ts"
+    )
+    .replace(
       "For project-local CLI installs, add it to the same tools prefix:",
       "For offline skill usage, Playwright must be pre-provisioned outside this bundle:"
     )
