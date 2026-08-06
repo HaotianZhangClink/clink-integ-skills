@@ -34,6 +34,9 @@ await esbuild.build({
   format: "esm",
   target: "node20",
   packages: "bundle",
+  // `clink login` is the only browser-backed command. Keep Playwright optional
+  // so the offline bundle stays self-contained for every non-browser command.
+  external: ["playwright"],
   absWorkingDir: cliRoot,
   nodePaths: [path.join(cliRoot, "node_modules")],
   banner: {
